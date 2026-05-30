@@ -10,6 +10,17 @@
 <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css" />
+<style>
+/* Correção específica do provador: mobile-first, controles recolhíveis e mira livre */
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Montserrat,system-ui,-apple-system,Segoe UI,sans-serif;color:#fff;overscroll-behavior:none;touch-action:none}
+.foot-body{height:100dvh;overflow:hidden;background:#000}.foot-stage{position:fixed;inset:0;background:#000;overflow:hidden}.foot-stage video,.foot-stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.foot-stage video{z-index:1;background:#000}.foot-stage video.mirror{transform:scaleX(-1)}#arCanvas{z-index:3;pointer-events:none}#guideCanvas{z-index:4;pointer-events:none}
+.target-guide{position:fixed;z-index:5;left:50%;top:50%;width:min(76vw,460px);height:min(46vh,330px);transform:translate(-50%,-50%);border:3px dashed rgba(246,200,79,.86);border-radius:54% 54% 48% 48%/62% 62% 42% 42%;box-shadow:0 0 0 9999px rgba(0,0,0,.12),0 0 42px rgba(246,200,79,.20);pointer-events:none}.target-guide:before{content:"PÉ + TORNOZELO AQUI";position:absolute;left:50%;top:-42px;transform:translateX(-50%);white-space:nowrap;border-radius:999px;padding:9px 13px;background:rgba(3,9,18,.78);border:1px solid rgba(255,255,255,.14);font-weight:950;color:#ffeaa1;font-size:12px;letter-spacing:.04em}.target-guide.locked{border-color:rgba(24,199,125,.95);box-shadow:0 0 0 9999px rgba(0,0,0,.06),0 0 50px rgba(24,199,125,.35)}
+.lock-ring{position:fixed;z-index:6;left:50%;top:50%;width:min(74vw,520px);max-width:520px;transform:translate(-50%,-50%);pointer-events:none}.progress{height:12px;border-radius:999px;background:rgba(255,255,255,.15);overflow:hidden;border:1px solid rgba(255,255,255,.18)}.progress b{display:block;height:100%;width:0%;background:linear-gradient(90deg,#18c77d,#f6c84f);transition:width .12s linear}.track-label{margin-top:10px;text-align:center;font-weight:950;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.9);font-size:13px}.quality-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 10px;background:rgba(4,10,18,.68);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:900;color:#dbeaff}.dot{width:9px;height:9px;border-radius:99px;background:#f45454;box-shadow:0 0 16px rgba(244,84,84,.6)}.dot.ok{background:#18c77d;box-shadow:0 0 16px rgba(24,199,125,.65)}
+.hud-top{position:fixed;z-index:25;top:calc(env(safe-area-inset-top) + 8px);left:8px;right:8px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;pointer-events:none}.hud-top>*{pointer-events:auto}.panel{border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(4,10,18,.64);backdrop-filter:blur(14px);box-shadow:0 16px 50px rgba(0,0,0,.28);padding:10px}.panel h1{font-size:15px;line-height:1.05;margin:0 0 3px}.panel p{font-size:11px;color:#d5e7ff;line-height:1.25;margin:0}.top-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.btn,button{min-height:38px;border:0;border-radius:14px;background:linear-gradient(180deg,#244265,#162b46);color:#fff;font-family:inherit;font-weight:950;cursor:pointer;padding:0 12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);touch-action:manipulation}.btn.small,button.small{min-height:34px;font-size:12px;padding:0 10px}.btn.gold,.gold{background:linear-gradient(180deg,#ffe16b,#c99816);color:#160f03}.btn.green,.green{background:linear-gradient(180deg,#19cc81,#0b8d58)}.btn.blue,.blue{background:linear-gradient(180deg,#4aa3ff,#176cc4)}.btn.ghost,.ghost{background:rgba(255,255,255,.08)}a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.hud{position:fixed;z-index:24;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);display:grid;gap:8px;max-height:48dvh;overflow:auto;pointer-events:auto;transition:transform .25s ease,opacity .25s ease;will-change:transform}.hud.collapsed{transform:translateY(calc(100% - 50px))}.drawer-toggle{position:sticky;top:0;z-index:2;width:100%;min-height:42px;border-radius:18px;background:linear-gradient(180deg,rgba(255,227,109,.96),rgba(201,152,22,.96));color:#160f03}.controls-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.sliders{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.slider-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:9px}.slider-card label{display:block;font-size:10px;color:#cde0f8;font-weight:950;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}.slider-card input{width:100%;accent-color:#f6c84f}.toggle-row{display:flex;gap:8px;flex-wrap:wrap}.chip{min-height:34px;border-radius:12px;background:rgba(255,255,255,.08);padding:0 10px;font-size:12px}.chip.active{background:linear-gradient(180deg,#ffe36d,#d3a218);color:#1b1404}.hint-card{font-size:12px;line-height:1.45;color:#d9e8fb}.debug{position:fixed;z-index:26;left:8px;bottom:60px;max-width:min(460px,calc(100vw - 16px));font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#b9cce4;background:rgba(5,12,22,.78);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:9px;display:none;white-space:pre-wrap;max-height:42vh;overflow:auto}.debug.show{display:block}.loading{position:fixed;z-index:40;inset:0;background:radial-gradient(circle,#12294a,#02060c);display:grid;place-items:center;text-align:center;padding:24px}.loading.hide{display:none}.loading-card{border:1px solid rgba(255,255,255,.13);border-radius:28px;padding:24px;background:rgba(255,255,255,.07);max-width:460px;box-shadow:0 30px 90px rgba(0,0,0,.45)}.loading-card h1{font-size:30px;margin:0 0 10px}.loading-card p{color:#cdddf0;line-height:1.5;margin:0 0 14px;font-size:14px}
+@media(max-width:700px){.hud-top{grid-template-columns:1fr;gap:6px}.top-actions{justify-content:flex-start}.top-actions .btn:not(.gold),.top-actions button:not(.gold){min-height:32px;font-size:11px}.hud{max-height:54dvh}.controls-grid{grid-template-columns:1fr 1fr}.sliders{grid-template-columns:1fr 1fr}.target-guide{width:82vw;height:45vh;top:48%}.lock-ring{top:48%;width:82vw}.target-guide:before{font-size:10px}.panel{border-radius:16px}.loading-card{border-radius:24px}}
+@media(max-width:420px){.sliders{grid-template-columns:1fr 1fr}.controls-grid{grid-template-columns:1fr 1fr}.btn,button{font-size:12px}.hud.collapsed{transform:translateY(calc(100% - 46px))}}
+</style>
 <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
 <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
@@ -17,15 +28,40 @@
 <div class="foot-stage" id="stage">
   <video id="video" autoplay playsinline muted></video>
   <canvas id="arCanvas"></canvas>
+  <canvas id="guideCanvas"></canvas>
   <div class="target-guide" id="targetGuide"></div>
-  <div class="lock-ring" id="lockRing"><div class="progress"><b id="lockProgress"></b></div><div class="track-label" id="trackLabel">Aguardando câmera</div></div>
+  <div class="lock-ring" id="lockRing">
+    <div class="progress"><b id="lockProgress"></b></div>
+    <div class="track-label" id="trackLabel">Aguardando câmera</div>
+  </div>
 </div>
-<div class="loading" id="loading"><div class="loading-card"><h1>IA no Pé</h1><p>Abra a câmera, coloque o pé dentro da mira e mantenha parado por 5 segundos para calçar o tênis virtual automaticamente.</p><button class="btn gold" id="openCameraBtn">Abrir câmera agora</button><p id="loadMsg" style="font-size:12px;margin-top:12px;color:#a9bdd5">O navegador vai pedir permissão de câmera.</p></div></div>
+
+<div class="loading" id="loading">
+  <div class="loading-card">
+    <h1>IA no Pé</h1>
+    <p>Abra a câmera, enquadre o <b>pé inteiro com o tornozelo/canela aparecendo</b> dentro da mira e mantenha parado até travar.</p>
+    <button class="btn gold" id="openCameraBtn">Abrir câmera agora</button>
+    <p id="loadMsg" style="font-size:12px;margin-top:12px;color:#a9bdd5">O navegador vai pedir permissão de câmera.</p>
+  </div>
+</div>
+
 <div class="hud-top">
-  <div class="panel"><h1>Corre 4 • Provador no Pé</h1><p id="stateText">Câmera desligada</p></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><a class="btn small ghost" href="index.html">Início</a><button class="btn small" id="debugBtn">Debug</button><button class="btn small gold" id="recalibrateBtn">Recalibrar</button></div>
+  <div class="panel">
+    <h1>Corre 4 • Provador no Pé</h1>
+    <p id="stateText">Toque em Abrir câmera</p>
+    <div style="margin-top:7px"><span class="quality-pill"><i class="dot" id="qualityDot"></i><span id="qualityText">sem leitura</span></span></div>
+  </div>
+  <div class="top-actions">
+    <a class="btn small ghost" href="index.html">Início</a>
+    <button class="btn small ghost" id="debugBtn">Debug</button>
+    <button class="btn small ghost" id="collapseBtn">Ajustes</button>
+    <button class="btn small gold" id="recalibrateBtn">Recalibrar</button>
+  </div>
 </div>
-<div class="hud">
+
+<div class="hud collapsed" id="hud">
+  <button class="drawer-toggle" id="drawerToggle">▲ Ajustes e controles</button>
+  <div class="panel hint-card" id="hintBox"><b>Dica:</b> o MediaPipe precisa ver o pé e o tornozelo. Se enquadrar só a ponta do pé, ele pode não encontrar os pontos.</div>
   <div class="panel">
     <div class="controls-grid">
       <button class="btn green" id="lockBtn">Travar agora</button>
@@ -40,20 +76,21 @@
       <button class="chip" data-foot="left">Esquerdo</button>
       <button class="chip" data-foot="right">Direito</button>
       <button class="chip" id="mirrorBtn">Espelhar</button>
-      <button class="chip active" id="guideBtn">Mostrar mira</button>
+      <button class="chip active" id="guideBtn">Mira</button>
     </div>
   </div>
   <div class="panel sliders">
-    <div class="slider-card"><label>Escala</label><input type="range" min="55" max="170" value="105" id="scaleAdj"></div>
-    <div class="slider-card"><label>Altura</label><input type="range" min="-90" max="90" value="-18" id="yAdj"></div>
-    <div class="slider-card"><label>Lateral</label><input type="range" min="-100" max="100" value="0" id="xAdj"></div>
-    <div class="slider-card"><label>Rotação</label><input type="range" min="-90" max="90" value="0" id="rotAdj"></div>
-    <div class="slider-card"><label>Suavização</label><input type="range" min="5" max="45" value="22" id="smoothAdj"></div>
-    <div class="slider-card"><label>Opacidade</label><input type="range" min="35" max="100" value="92" id="opacityAdj"></div>
-    <div class="slider-card"><label>Pitch</label><input type="range" min="-55" max="55" value="-10" id="pitchAdj"></div>
-    <div class="slider-card"><label>Profundidade</label><input type="range" min="-60" max="60" value="0" id="yawAdj"></div>
+    <div class="slider-card"><label>Escala</label><input type="range" min="55" max="180" value="110" id="scaleAdj"></div>
+    <div class="slider-card"><label>Altura</label><input type="range" min="-130" max="130" value="-20" id="yAdj"></div>
+    <div class="slider-card"><label>Lateral</label><input type="range" min="-140" max="140" value="0" id="xAdj"></div>
+    <div class="slider-card"><label>Rotação</label><input type="range" min="-110" max="110" value="0" id="rotAdj"></div>
+    <div class="slider-card"><label>Suavização</label><input type="range" min="8" max="60" value="26" id="smoothAdj"></div>
+    <div class="slider-card"><label>Opacidade</label><input type="range" min="35" max="100" value="93" id="opacityAdj"></div>
+    <div class="slider-card"><label>Inclinação</label><input type="range" min="-70" max="70" value="-10" id="pitchAdj"></div>
+    <div class="slider-card"><label>Perspectiva</label><input type="range" min="-70" max="70" value="0" id="yawAdj"></div>
   </div>
 </div>
+
 <pre class="debug" id="debugBox"></pre>
 <script src="assets/js/product-data.js"></script>
 <script type="module">
@@ -61,283 +98,204 @@ import { PoseLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@m
 
 const $ = (s)=>document.querySelector(s);
 const $$ = (s)=>Array.from(document.querySelectorAll(s));
-const video = $('#video');
-const canvas = $('#arCanvas');
-const stage = $('#stage');
-const loading = $('#loading');
-const loadMsg = $('#loadMsg');
-const stateText = $('#stateText');
-const lockProgress = $('#lockProgress');
-const trackLabel = $('#trackLabel');
-const targetGuide = $('#targetGuide');
-const debugBox = $('#debugBox');
+const video=$('#video'), canvas=$('#arCanvas'), guideCanvas=$('#guideCanvas'), stage=$('#stage');
+const loading=$('#loading'), loadMsg=$('#loadMsg'), stateText=$('#stateText');
+const lockProgress=$('#lockProgress'), trackLabel=$('#trackLabel'), targetGuide=$('#targetGuide');
+const debugBox=$('#debugBox'), hud=$('#hud'), qualityDot=$('#qualityDot'), qualityText=$('#qualityText');
+const gctx=guideCanvas.getContext('2d');
 
-let stream = null, cameraFacing = 'environment';
-let poseLandmarker = null, poseReady = false, poseError = '';
-let state = 'IDLE';
-let desiredFoot = 'auto';
-let frozen = false, mirror = false, showGuide = true;
-let lastVideoTime = -1, lastMetrics = null, lockProgressMs = 0, lastFrameMs = performance.now();
-let stableFrames = [];
-let currentTransform = {x:0,y:0,z:0,scale:1,rz:0,rx:0,ry:0};
-let lockedTransform = null;
-let footSelected = 'auto';
+let stream=null, cameraFacing='environment';
+let poseLandmarker=null, poseReady=false, poseError='';
+let state='IDLE', desiredFoot='auto', frozen=false, mirror=false, showGuide=true;
+let lastVideoTime=-1, lastMetrics=null, lockProgressMs=0, lastFrameMs=performance.now();
+let stableFrames=[], currentTransform={x:0,y:0,z:0,scale:1,rz:0,rx:0,ry:0};
+let footSelected='auto', trackingStarted=false;
+const LOCK_MS=3600;
 
-const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true, preserveDrawingBuffer:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1,2));
-renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.shadowMap.enabled = true;
-const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1,1,1,-1,-1000,1000);
-camera.position.z = 100;
-const hemi = new THREE.HemisphereLight(0xffffff,0x224466,1.6); scene.add(hemi);
-const key = new THREE.DirectionalLight(0xffffff,1.8); key.position.set(0,0,200); scene.add(key);
-let shoeRoot = new THREE.Group(); scene.add(shoeRoot);
-let shoeModel = null, bboxSize = new THREE.Vector3(1,1,1), bboxCenter = new THREE.Vector3();
-let anchorLength = 1;
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+const scene=new THREE.Scene();
+const camera=new THREE.OrthographicCamera(-1,1,1,-1,-1000,1000); camera.position.z=100;
+scene.add(new THREE.HemisphereLight(0xffffff,0x224466,1.7));
+const key=new THREE.DirectionalLight(0xffffff,1.9); key.position.set(0,0,200); scene.add(key);
+let shoeRoot=new THREE.Group(); scene.add(shoeRoot);
+let shoeModel=null, bboxSize=new THREE.Vector3(1,1,1), bboxCenter=new THREE.Vector3();
+let anchorLength=1, anchorMid=new THREE.Vector3(0,0,0);
 
-function setState(s,msg){ state=s; stateText.textContent=msg||s; }
-function status(msg){ trackLabel.textContent=msg; }
-function debug(obj){ if(!debugBox.classList.contains('show')) return; debugBox.textContent = typeof obj==='string'?obj:JSON.stringify(obj,null,2); }
+function setState(s,msg){state=s; stateText.textContent=msg||s;}
+function status(msg){trackLabel.textContent=msg;}
+function getVal(id,div=1){return Number($('#'+id)?.value||0)/div;}
+function deg(v){return v*Math.PI/180;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function lerp(a,b,t){return a+(b-a)*t;}
+function lerpAngle(a,b,t){let d=((b-a+Math.PI)%(Math.PI*2))-Math.PI; return a+d*t;}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function angle(a,b){return Math.atan2(b.y-a.y,b.x-a.x);}
+function debug(obj){if(!debugBox.classList.contains('show'))return; debugBox.textContent=typeof obj==='string'?obj:JSON.stringify(obj,null,2);}
 
 function resize(){
-  const w = stage.clientWidth, h = stage.clientHeight;
-  renderer.setSize(w,h,false);
+  const w=stage.clientWidth, h=stage.clientHeight;
+  renderer.setSize(w,h,false); guideCanvas.width=w; guideCanvas.height=h;
   camera.left=-w/2; camera.right=w/2; camera.top=h/2; camera.bottom=-h/2; camera.updateProjectionMatrix();
 }
 window.addEventListener('resize',resize); resize();
 
-function getVal(id,div=1){ return Number($('#'+id)?.value||0)/div; }
-function deg(v){ return v*Math.PI/180; }
-function lerp(a,b,t){ return a+(b-a)*t; }
-function lerpAngle(a,b,t){ let d=((b-a+Math.PI)%(Math.PI*2))-Math.PI; return a+d*t; }
-
 async function loadModel(){
   return new Promise((resolve,reject)=>{
-    const loader = new THREE.GLTFLoader();
+    const loader=new THREE.GLTFLoader();
     loader.load('models/corre4.glb', gltf=>{
-      shoeModel = gltf.scene;
-      shoeRoot.clear(); shoeRoot.add(shoeModel);
-      shoeModel.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; if(o.material){ o.material.transparent=true; o.material.opacity=getVal('opacityAdj',100)||.92; } } });
-      const box = new THREE.Box3().setFromObject(shoeModel); box.getSize(bboxSize); box.getCenter(bboxCenter);
-      shoeModel.position.sub(bboxCenter);
-      // Try to use anchors if a future professional GLB has them.
-      const toe = shoeModel.getObjectByName('TOE_ANCHOR');
-      const heel = shoeModel.getObjectByName('HEEL_ANCHOR');
-      if(toe && heel){
-        shoeModel.updateMatrixWorld(true);
-        const tv = new THREE.Vector3().setFromMatrixPosition(toe.matrixWorld);
-        const hv = new THREE.Vector3().setFromMatrixPosition(heel.matrixWorld);
-        anchorLength = Math.max(tv.distanceTo(hv), bboxSize.x, 0.01);
-      } else {
-        anchorLength = Math.max(bboxSize.x, bboxSize.y, bboxSize.z, 0.01);
+      shoeModel=gltf.scene; shoeRoot.clear(); shoeRoot.add(shoeModel);
+      shoeModel.traverse(o=>{if(o.isMesh){o.frustumCulled=false; if(o.material){o.material.transparent=true; o.material.opacity=getVal('opacityAdj',100)||.93;}}});
+      const box=new THREE.Box3().setFromObject(shoeModel); box.getSize(bboxSize); box.getCenter(bboxCenter);
+      shoeModel.position.sub(bboxCenter); shoeModel.updateMatrixWorld(true);
+      const toe=shoeModel.getObjectByName('TOE_ANCHOR'), heel=shoeModel.getObjectByName('HEEL_ANCHOR');
+      if(toe&&heel){
+        const tv=new THREE.Vector3(), hv=new THREE.Vector3(); toe.getWorldPosition(tv); heel.getWorldPosition(hv);
+        anchorLength=Math.max(tv.distanceTo(hv),bboxSize.x,0.01); anchorMid.copy(tv).add(hv).multiplyScalar(.5);
+      }else{
+        anchorLength=Math.max(bboxSize.x,bboxSize.y,bboxSize.z,0.01); anchorMid.set(0,0,0);
       }
-      shoeRoot.visible=false;
-      resolve();
+      shoeRoot.visible=false; resolve();
     },undefined,reject);
   });
 }
 
+async function createPose(delegate,model){
+  const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+  return PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:`https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_${model}/float16/latest/pose_landmarker_${model}.task`,delegate},runningMode:'VIDEO',numPoses:1,minPoseDetectionConfidence:.25,minPosePresenceConfidence:.25,minTrackingConfidence:.25});
+}
 async function initPose(){
-  try{
-    loadMsg.textContent = 'Carregando IA do pé...';
-    const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
-    poseLandmarker = await PoseLandmarker.createFromOptions(vision,{
-      baseOptions:{ modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task', delegate:'GPU' },
-      runningMode:'VIDEO', numPoses:1, minPoseDetectionConfidence:.45, minPosePresenceConfidence:.45, minTrackingConfidence:.45
-    });
-    poseReady = true; poseError='';
-  }catch(e){
-    poseReady=false; poseError = e?.message || String(e);
-    console.warn('MediaPipe falhou:', e);
+  const tries=[['GPU','full'],['CPU','full'],['GPU','lite'],['CPU','lite']];
+  for(const [delegate,model] of tries){
+    try{loadMsg.textContent=`Carregando IA do pé (${model}/${delegate})...`; poseLandmarker=await createPose(delegate,model); poseReady=true; poseError=''; return;}
+    catch(e){poseError=e?.message||String(e); console.warn('tentativa MediaPipe falhou',delegate,model,e);}
   }
+  poseReady=false;
 }
 
 async function openCamera(){
   try{
-    loading.classList.remove('hide');
-    loadMsg.textContent = 'Abrindo câmera...';
-    if(!navigator.mediaDevices?.getUserMedia) throw new Error('Câmera indisponível neste navegador ou sem HTTPS.');
+    loading.classList.remove('hide'); loadMsg.textContent='Abrindo câmera...';
+    if(!navigator.mediaDevices?.getUserMedia) throw new Error('Câmera indisponível. Abra por HTTPS no celular.');
     if(stream) stream.getTracks().forEach(t=>t.stop());
-    const constraints = { video:{ facingMode:{ideal:cameraFacing}, width:{ideal:1280}, height:{ideal:720} }, audio:false };
-    try{ stream = await navigator.mediaDevices.getUserMedia(constraints); }
-    catch(err){ stream = await navigator.mediaDevices.getUserMedia({video:true,audio:false}); }
-    video.srcObject = stream;
-    await video.play();
-    await loadModel();
-    await initPose();
+    try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:cameraFacing},width:{ideal:1280},height:{ideal:720}},audio:false});}
+    catch(e){stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
+    video.srcObject=stream; await video.play();
+    await loadModel(); await initPose();
+    video.classList.toggle('mirror',mirror);
     loading.classList.add('hide');
-    setState('SEARCHING_FOOT', poseReady?'Coloque o pé na mira':'Câmera aberta • IA falhou, use ajuste manual');
-    status(poseReady?'Coloque o pé dentro da mira':'IA não carregou: modo manual disponível');
+    setState('SEARCHING_FOOT',poseReady?'Coloque pé + tornozelo na mira':'Câmera aberta • IA falhou, use travar agora/manual');
+    status(poseReady?'Mostre o pé inteiro e o tornozelo':'IA indisponível: use controles manuais');
     requestAnimationFrame(loop);
-  }catch(e){
-    loadMsg.textContent = 'Erro: '+(e?.message||e);
-    setState('ERROR','Erro ao abrir câmera');
-  }
+  }catch(e){loadMsg.textContent='Erro: '+(e?.message||e); setState('ERROR','Erro ao abrir câmera');}
 }
 
-function lmToScreen(lm){
-  const W=canvas.clientWidth, H=canvas.clientHeight;
-  const vw=video.videoWidth||W, vh=video.videoHeight||H;
+function coverMap(lm){
+  const W=guideCanvas.width, H=guideCanvas.height, vw=video.videoWidth||W, vh=video.videoHeight||H;
   const sc=Math.max(W/vw,H/vh), dw=vw*sc, dh=vh*sc, ox=(W-dw)/2, oy=(H-dh)/2;
-  let x=ox+lm.x*dw, y=oy+lm.y*dh;
-  if(mirror) x = W-x;
+  let x=ox+(lm.x||0)*dw, y=oy+(lm.y||0)*dh; if(mirror) x=W-x;
   return {x,y,z:lm.z||0,visibility:lm.visibility??1,presence:lm.presence??1};
 }
-function dist(a,b){ return Math.hypot(a.x-b.x,a.y-b.y); }
-function angle(a,b){ return Math.atan2(b.y-a.y,b.x-a.x); }
+function inViewport(p){const W=guideCanvas.width,H=guideCanvas.height;return p.x>-W*.2&&p.x<W*1.2&&p.y>-H*.2&&p.y<H*1.2;}
 function insideTarget(m){
-  const W=canvas.clientWidth, H=canvas.clientHeight;
-  const cx=W/2, cy=H*.52, rx=Math.min(W*.58,420)/2, ry=Math.min(H*.32,260)/2;
+  const W=guideCanvas.width,H=guideCanvas.height,cx=W/2,cy=H*.50,rx=Math.min(W*.82,460)/2,ry=Math.min(H*.45,330)/2;
   const n=((m.center.x-cx)**2)/(rx*rx)+((m.center.y-cy)**2)/(ry*ry);
-  return n<1.35 && m.length>Math.max(70,W*.12) && m.length<Math.min(W*.85,H*.75);
+  return n<1.45 && m.length>Math.max(38,W*.065) && m.length<Math.min(W*.92,H*.84) && inViewport(m.center);
 }
-function footMetrics(lms, world, side){
-  const idx = side==='left'?{ankle:27,heel:29,toe:31}:{ankle:28,heel:30,toe:32};
-  const ankle = lmToScreen(lms[idx.ankle]||{}), heel=lmToScreen(lms[idx.heel]||{}), toe=lmToScreen(lms[idx.toe]||{});
-  const vis = ((lms[idx.ankle]?.visibility??1)+(lms[idx.heel]?.visibility??1)+(lms[idx.toe]?.visibility??1))/3;
-  const length = dist(heel,toe);
-  const center = {x:(heel.x+toe.x)*.5, y:(heel.y+toe.y)*.5};
-  const rz = angle(heel,toe);
-  let worldPitch=0, worldYaw=0;
-  if(world?.[idx.heel] && world?.[idx.toe] && world?.[idx.ankle]){
-    const wh=world[idx.heel], wt=world[idx.toe], wa=world[idx.ankle];
-    worldYaw = Math.atan2((wt.z-wh.z),(wt.x-wh.x));
-    worldPitch = Math.atan2((wa.y-wh.y),(length/Math.max(canvas.clientWidth,1)));
+function footMetrics(lms,world,side){
+  const idx=side==='left'?{ankle:27,heel:29,toe:31,knee:25}:{ankle:28,heel:30,toe:32,knee:26};
+  const ankle=coverMap(lms[idx.ankle]||{}), heel=coverMap(lms[idx.heel]||{}), toe=coverMap(lms[idx.toe]||{}), knee=coverMap(lms[idx.knee]||{});
+  const raw=[lms[idx.ankle],lms[idx.heel],lms[idx.toe]].filter(Boolean);
+  const vis=raw.length?raw.reduce((s,x)=>s+(x.visibility??x.presence??1),0)/raw.length:0;
+  const length=dist(heel,toe), center={x:(heel.x+toe.x)*.5,y:(heel.y+toe.y)*.5};
+  const rz=angle(heel,toe);
+  let worldPitch=0,worldYaw=0;
+  if(world?.[idx.heel]&&world?.[idx.toe]&&world?.[idx.ankle]){
+    const wh=world[idx.heel],wt=world[idx.toe],wa=world[idx.ankle];
+    worldYaw=Math.atan2((wt.z-wh.z),(wt.x-wh.x));
+    worldPitch=Math.atan2((wa.y-wh.y),Math.max(.001,Math.abs(wt.x-wh.x)));
   }
-  return {side, ankle, heel, toe, vis, length, center, rz, worldPitch, worldYaw, inside:false, score:vis*100 + length*.05};
+  const m={side,ankle,heel,toe,knee,vis,length,center,rz,worldPitch,worldYaw,inside:false,score:vis*140+length*.08+(inViewport(center)?30:0)};
+  m.inside=insideTarget(m); return m;
 }
-function chooseFoot(result){
-  if(!result?.landmarks?.[0]) return null;
-  const lms=result.landmarks[0], world=result.worldLandmarks?.[0];
-  const L=footMetrics(lms,world,'left'), R=footMetrics(lms,world,'right');
-  L.inside=insideTarget(L); R.inside=insideTarget(R);
-  if(desiredFoot==='left') return L;
-  if(desiredFoot==='right') return R;
-  if(L.inside && !R.inside) return L;
-  if(R.inside && !L.inside) return R;
+function chooseFoot(res){
+  const lms=res?.landmarks?.[0]; if(!lms) return null;
+  const world=res.worldLandmarks?.[0]; const L=footMetrics(lms,world,'left'), R=footMetrics(lms,world,'right');
+  if(desiredFoot==='left')return L; if(desiredFoot==='right')return R;
+  if(L.inside&&!R.inside)return L; if(R.inside&&!L.inside)return R;
   return L.score>=R.score?L:R;
 }
-function isStable(m, dt){
-  stableFrames.push({x:m.center.x,y:m.center.y,len:m.length,rz:m.rz,t:performance.now()});
-  if(stableFrames.length>14) stableFrames.shift();
-  if(stableFrames.length<5) return false;
-  const first=stableFrames[0], last=stableFrames[stableFrames.length-1];
-  const dc=Math.hypot(last.x-first.x,last.y-first.y), dl=Math.abs(last.len-first.len), da=Math.abs(((last.rz-first.rz+Math.PI)%(Math.PI*2))-Math.PI);
-  return dc<28 && dl<28 && da<.28 && m.inside && m.vis>.35;
+function updateQuality(m){
+  const ok=!!(m&&m.length>35&&m.vis>.08); qualityDot.classList.toggle('ok',ok);
+  qualityText.textContent=ok?`pé ${m.side==='left'?'esq.':'dir.'} detectado`:(poseReady?'procurando pé':'IA indisponível');
+}
+function stability(m){
+  stableFrames.push({x:m.center.x,y:m.center.y,len:m.length,rz:m.rz,t:performance.now()}); if(stableFrames.length>9)stableFrames.shift();
+  if(stableFrames.length<4)return .4;
+  const xs=stableFrames.map(f=>f.x),ys=stableFrames.map(f=>f.y),ls=stableFrames.map(f=>f.len),as=stableFrames.map(f=>f.rz);
+  const range=a=>Math.max(...a)-Math.min(...a);
+  const da=Math.max(...as)-Math.min(...as);
+  const movement=Math.hypot(range(xs),range(ys))+range(ls)+Math.min(da,Math.PI*2-da)*80;
+  return clamp(1-movement/120,0,1);
 }
 function targetFromMetrics(m){
-  const scaleAdj = getVal('scaleAdj',100) || 1;
-  const xAdj = getVal('xAdj',1);
-  const yAdj = getVal('yAdj',1);
-  const rotAdj = deg(getVal('rotAdj',1));
-  const pitchAdj = deg(getVal('pitchAdj',1));
-  const yawAdj = deg(getVal('yawAdj',1));
-  const W=canvas.clientWidth, H=canvas.clientHeight;
-  // Automatic 2D alignment: heel-toe line defines position, screen rotation and scale.
-  const baseScale = (m.length / Math.max(anchorLength,1)) * scaleAdj;
-  return {
-    x: m.center.x - W/2 + xAdj,
-    y: H/2 - m.center.y - yAdj,
-    z: 0,
-    scale: baseScale,
-    rz: -m.rz + rotAdj,
-    rx: pitchAdj + THREE.MathUtils.clamp(m.worldPitch*.18,-.55,.55),
-    ry: yawAdj + THREE.MathUtils.clamp(m.worldYaw*.75,-.8,.8)
-  };
+  const scaleAdj=getVal('scaleAdj',100)||1, xAdj=getVal('xAdj',1), yAdj=getVal('yAdj',1), rotAdj=deg(getVal('rotAdj',1)), pitchAdj=deg(getVal('pitchAdj',1)), yawAdj=deg(getVal('yawAdj',1));
+  const W=guideCanvas.width,H=guideCanvas.height;
+  const baseScale=(m.length/Math.max(anchorLength,0.01))*scaleAdj;
+  return {x:m.center.x-W/2+xAdj,y:H/2-m.center.y-yAdj,z:0,scale:baseScale,rz:-m.rz+rotAdj,rx:pitchAdj+clamp(m.worldPitch*.10,-.55,.55),ry:yawAdj+clamp(m.worldYaw*.65,-.8,.8)};
 }
-function applyTransform(t, force=false){
-  if(!shoeRoot) return;
-  const alpha = force ? 1 : (getVal('smoothAdj',100) || .22);
-  currentTransform.x=lerp(currentTransform.x,t.x,alpha);
-  currentTransform.y=lerp(currentTransform.y,t.y,alpha);
-  currentTransform.scale=lerp(currentTransform.scale,t.scale,alpha);
-  currentTransform.rz=lerpAngle(currentTransform.rz,t.rz,alpha);
-  currentTransform.rx=lerpAngle(currentTransform.rx,t.rx,alpha);
-  currentTransform.ry=lerpAngle(currentTransform.ry,t.ry,alpha);
-  shoeRoot.position.set(currentTransform.x,currentTransform.y,0);
-  shoeRoot.rotation.set(currentTransform.rx,currentTransform.ry,currentTransform.rz);
-  shoeRoot.scale.setScalar(currentTransform.scale);
-  const op=getVal('opacityAdj',100)||.92;
-  shoeRoot.traverse(o=>{ if(o.isMesh && o.material){ o.material.opacity=op; o.material.transparent=op<.99; } });
+function applyTransform(t,force=false){
+  const alpha=force?1:clamp(getVal('smoothAdj',100)||.26,.08,.60);
+  currentTransform.x=lerp(currentTransform.x,t.x,alpha); currentTransform.y=lerp(currentTransform.y,t.y,alpha); currentTransform.scale=lerp(currentTransform.scale,t.scale,alpha);
+  currentTransform.rz=lerpAngle(currentTransform.rz,t.rz,alpha); currentTransform.rx=lerpAngle(currentTransform.rx,t.rx,alpha); currentTransform.ry=lerpAngle(currentTransform.ry,t.ry,alpha);
+  shoeRoot.position.set(currentTransform.x,currentTransform.y,0); shoeRoot.rotation.set(currentTransform.rx,currentTransform.ry,currentTransform.rz); shoeRoot.scale.setScalar(currentTransform.scale);
+  const op=getVal('opacityAdj',100)||.93; shoeRoot.traverse(o=>{if(o.isMesh&&o.material){o.material.opacity=op;o.material.transparent=op<.99;}});
 }
-function renderGuide(m){
-  // Draw simple landmark guide on top using a separate 2D context layered inside the Three canvas background is not possible here.
-  // Instead create small CSS-like points in Three as future improvement. Current visual uses target ring and debug text.
+function drawGuide(m){
+  const W=guideCanvas.width,H=guideCanvas.height; gctx.clearRect(0,0,W,H);
+  if(!m)return;
+  gctx.save(); gctx.lineWidth=4; gctx.strokeStyle=m.inside?'rgba(24,199,125,.95)':'rgba(246,200,79,.95)'; gctx.fillStyle='rgba(255,255,255,.95)';
+  gctx.beginPath(); gctx.moveTo(m.heel.x,m.heel.y); gctx.lineTo(m.toe.x,m.toe.y); gctx.stroke();
+  [[m.heel,'calcanhar'],[m.toe,'ponta'],[m.ankle,'tornozelo']].forEach(([p,label])=>{gctx.beginPath();gctx.arc(p.x,p.y,7,0,Math.PI*2);gctx.fill();gctx.font='700 11px Montserrat';gctx.fillText(label,p.x+10,p.y-8);});
+  gctx.restore();
 }
+function recalibrate(){lockProgressMs=0;stableFrames=[];shoeRoot.visible=false;targetGuide.classList.remove('locked');trackingStarted=false;setState('SEARCHING_FOOT','Coloque pé + tornozelo na mira');status('Mantenha parado até travar');lockProgress.style.width='0%';hud.classList.remove('collapsed');}
+function forceLock(){if(lastMetrics){const t=targetFromMetrics(lastMetrics);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Travado manualmente • seguindo pé');status('Tênis calçado • mova devagar');lockProgress.style.width='100%';hud.classList.add('collapsed');}else{shoeRoot.visible=true;setState('LIVE_TRACKING','Modo manual • ajuste pelos controles');hud.classList.remove('collapsed');}}
 function loop(now){
-  resize();
-  const dt=Math.min(100, now-lastFrameMs); lastFrameMs=now;
-  let m=null;
-  if(poseReady && video.readyState>=2 && video.currentTime!==lastVideoTime){
-    lastVideoTime=video.currentTime;
-    let res=null;
-    try{ res=poseLandmarker.detectForVideo(video, now); }catch(e){ poseError=e?.message||String(e); }
-    m=chooseFoot(res);
-  }
-  if(m){ footSelected=m.side; }
-  if(!frozen && m && state!=='ERROR'){
-    const stable=isStable(m,dt);
-    if(state==='SEARCHING_FOOT' || state==='FOOT_LOCKING'){
-      if(m.inside && stable){
-        lockProgressMs += dt;
-        setState('FOOT_LOCKING',`Segure o pé parado • ${Math.ceil((5000-lockProgressMs)/1000)}s`);
-      } else {
-        lockProgressMs = Math.max(0, lockProgressMs-dt*1.2);
-        setState('SEARCHING_FOOT',`Centralize o pé na mira • ${m.side==='left'?'esquerdo':'direito'}`);
-      }
-      lockProgress.style.width = `${Math.min(100,lockProgressMs/50)}%`;
-      status(m.inside?'Pé encontrado • mantenha parado':'Coloque o pé inteiro dentro da mira');
-      if(lockProgressMs>=5000){
-        lockedTransform = targetFromMetrics(m);
-        applyTransform(lockedTransform,true);
-        shoeRoot.visible=true;
-        setState('LIVE_TRACKING','Pé travado • tênis acompanhando automaticamente');
-        status('Tênis calçado • mova o pé devagar');
-      }
-    } else if(state==='LIVE_TRACKING'){
-      const t=targetFromMetrics(m);
-      applyTransform(t,false);
-      lockProgress.style.width='100%';
-      status(`Seguindo pé ${m.side==='left'?'esquerdo':'direito'} automaticamente`);
+  resize(); const dt=Math.min(100,now-lastFrameMs); lastFrameMs=now; let m=null;
+  if(poseReady&&video.readyState>=2&&video.currentTime!==lastVideoTime){lastVideoTime=video.currentTime;try{m=chooseFoot(poseLandmarker.detectForVideo(video,now));}catch(e){poseError=e?.message||String(e);}}
+  if(m){lastMetrics=m; footSelected=m.side;} updateQuality(m); drawGuide(m);
+  if(!frozen&&m&&state!=='ERROR'){
+    const stab=stability(m);
+    if(state==='SEARCHING_FOOT'||state==='FOOT_LOCKING'){
+      if(m.length>35&&m.vis>.08&&m.inside){lockProgressMs+=dt*(.65+stab*.85);setState('FOOT_LOCKING',`Pé encontrado • segurando para travar`);} 
+      else if(m.length>35&&m.vis>.08){lockProgressMs+=dt*.25;setState('FOOT_LOCKING',`Aproxime da mira • pé ${m.side==='left'?'esquerdo':'direito'}`);} 
+      else {lockProgressMs=Math.max(0,lockProgressMs-dt*.7);setState('SEARCHING_FOOT','Mostre pé + tornozelo dentro da mira');}
+      lockProgressMs=clamp(lockProgressMs,0,LOCK_MS); lockProgress.style.width=`${Math.round(lockProgressMs/LOCK_MS*100)}%`;
+      status(m.inside?`Leitura boa • estabilidade ${Math.round(stab*100)}%`:'Centralize o pé e deixe tornozelo visível');
+      if(lockProgressMs>=LOCK_MS){const t=targetFromMetrics(m);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Pé travado • tênis acompanhando');status('Tênis calçado • vire o pé devagar');hud.classList.add('collapsed');}
+    }else if(state==='LIVE_TRACKING'){
+      applyTransform(targetFromMetrics(m),false); lockProgress.style.width='100%'; status(`Seguindo pé ${m.side==='left'?'esquerdo':'direito'} automaticamente`);
     }
-    lastMetrics=m;
-  } else if(!m && state!=='IDLE'){
-    if(state==='LIVE_TRACKING') status('Pé saiu da câmera • tentando recuperar');
-    else status(poseReady?'Procurando pé...':'IA indisponível • use manual');
+  }else if(!m&&state!=='IDLE'){
+    if(state==='LIVE_TRACKING')status('Pé saiu da câmera • mantendo última posição'); else status(poseReady?'Procurando pé e tornozelo...':'IA indisponível • use Travar agora/manual');
   }
   renderer.render(scene,camera);
   debug({state,poseReady,poseError,footSelected,metrics:lastMetrics&&{side:lastMetrics.side,inside:lastMetrics.inside,len:Math.round(lastMetrics.length),vis:+lastMetrics.vis.toFixed(2),angle:+lastMetrics.rz.toFixed(2)},transform:{x:Math.round(currentTransform.x),y:Math.round(currentTransform.y),scale:+currentTransform.scale.toFixed(2),rz:+currentTransform.rz.toFixed(2)}});
   requestAnimationFrame(loop);
 }
+async function takePhoto(){const W=guideCanvas.width,H=guideCanvas.height,c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');const vw=video.videoWidth||W,vh=video.videoHeight||H,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2;ctx.drawImage(video,ox,oy,dw,dh);ctx.drawImage(canvas,0,0,W,H);ctx.drawImage(guideCanvas,0,0,W,H);const a=document.createElement('a');a.download='corre4-provador-pe.png';a.href=c.toDataURL('image/png');a.click();}
 
-function recalibrate(){
-  lockProgressMs=0; stableFrames=[]; lockedTransform=null; shoeRoot.visible=false; setState('SEARCHING_FOOT','Coloque o pé na mira'); status('Mantenha o pé parado por 5 segundos'); lockProgress.style.width='0%';
-}
-function forceLock(){ if(lastMetrics){ lockedTransform=targetFromMetrics(lastMetrics); applyTransform(lockedTransform,true); shoeRoot.visible=true; setState('LIVE_TRACKING','Travado manualmente • seguindo pé'); lockProgress.style.width='100%'; } else { shoeRoot.visible=true; setState('LIVE_TRACKING','Modo manual • ajuste pelos controles'); } }
-async function takePhoto(){
-  const W=canvas.clientWidth,H=canvas.clientHeight; const c=document.createElement('canvas'); c.width=W; c.height=H; const ctx=c.getContext('2d');
-  // draw video as cover
-  const vw=video.videoWidth||W,vh=video.videoHeight||H,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2;
-  ctx.drawImage(video,ox,oy,dw,dh); ctx.drawImage(canvas,0,0,W,H);
-  const a=document.createElement('a'); a.download='corre4-provador-pe.png'; a.href=c.toDataURL('image/png'); a.click();
-}
-
-$('#openCameraBtn').addEventListener('click',openCamera);
-$('#recalibrateBtn').addEventListener('click',recalibrate);
-$('#lockBtn').addEventListener('click',forceLock);
-$('#freezeBtn').addEventListener('click',()=>{ frozen=!frozen; $('#freezeBtn').textContent=frozen?'Continuar':'Congelar'; });
-$('#photoBtn').addEventListener('click',takePhoto);
-$('#debugBtn').addEventListener('click',()=>debugBox.classList.toggle('show'));
-$('#switchCameraBtn').addEventListener('click',async()=>{ cameraFacing=cameraFacing==='environment'?'user':'environment'; mirror=cameraFacing==='user'; $('#mirrorBtn').classList.toggle('active',mirror); await openCamera(); });
-$('#mirrorBtn').addEventListener('click',()=>{ mirror=!mirror; $('#mirrorBtn').classList.toggle('active',mirror); });
-$('#guideBtn').addEventListener('click',()=>{ showGuide=!showGuide; targetGuide.style.display=showGuide?'block':'none'; $('#lockRing').style.display=showGuide?'block':'none'; $('#guideBtn').classList.toggle('active',showGuide); });
-$$('.chip[data-foot]').forEach(b=>b.addEventListener('click',()=>{ $$('.chip[data-foot]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); desiredFoot=b.dataset.foot; recalibrate(); }));
-['scaleAdj','yAdj','xAdj','rotAdj','pitchAdj','yawAdj','opacityAdj'].forEach(id=>$('#'+id)?.addEventListener('input',()=>{ if(lastMetrics){ applyTransform(targetFromMetrics(lastMetrics),false); } }));
-
-// If opened from HTTPS, still require tap for camera. Do not auto-open to avoid browser block.
-setState('IDLE','Toque em Abrir câmera');
-status('Toque em Abrir câmera agora');
+$('#openCameraBtn').addEventListener('click',openCamera); $('#recalibrateBtn').addEventListener('click',recalibrate); $('#lockBtn').addEventListener('click',forceLock); $('#photoBtn').addEventListener('click',takePhoto);
+$('#freezeBtn').addEventListener('click',()=>{frozen=!frozen;$('#freezeBtn').textContent=frozen?'Continuar':'Congelar';}); $('#debugBtn').addEventListener('click',()=>debugBox.classList.toggle('show'));
+$('#collapseBtn').addEventListener('click',()=>hud.classList.toggle('collapsed')); $('#drawerToggle').addEventListener('click',()=>hud.classList.toggle('collapsed'));
+$('#switchCameraBtn').addEventListener('click',async()=>{cameraFacing=cameraFacing==='environment'?'user':'environment';mirror=cameraFacing==='user';$('#mirrorBtn').classList.toggle('active',mirror);video.classList.toggle('mirror',mirror);recalibrate();await openCamera();});
+$('#mirrorBtn').addEventListener('click',()=>{mirror=!mirror;video.classList.toggle('mirror',mirror);$('#mirrorBtn').classList.toggle('active',mirror);});
+$('#guideBtn').addEventListener('click',()=>{showGuide=!showGuide;targetGuide.style.display=showGuide?'block':'none';$('#lockRing').style.display=showGuide?'block':'none';$('#guideBtn').classList.toggle('active',showGuide);});
+$$('.chip[data-foot]').forEach(b=>b.addEventListener('click',()=>{$$('.chip[data-foot]').forEach(x=>x.classList.remove('active'));b.classList.add('active');desiredFoot=b.dataset.foot;recalibrate();}));
+['scaleAdj','yAdj','xAdj','rotAdj','pitchAdj','yawAdj','opacityAdj','smoothAdj'].forEach(id=>$('#'+id)?.addEventListener('input',()=>{if(lastMetrics){applyTransform(targetFromMetrics(lastMetrics),false);}}));
+setState('IDLE','Toque em Abrir câmera'); status('Toque em Abrir câmera agora');
 </script>
 </body>
 </html>
