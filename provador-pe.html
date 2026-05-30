@@ -80,7 +80,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-f
     </div>
   </div>
   <div class="panel sliders">
-    <div class="slider-card"><label>Escala</label><input type="range" min="55" max="180" value="110" id="scaleAdj"></div>
+    <div class="slider-card"><label>Tamanho fixo</label><input type="range" min="55" max="180" value="110" id="scaleAdj"></div>
     <div class="slider-card"><label>Altura</label><input type="range" min="-130" max="130" value="-20" id="yAdj"></div>
     <div class="slider-card"><label>Lateral</label><input type="range" min="-140" max="140" value="0" id="xAdj"></div>
     <div class="slider-card"><label>Rotação</label><input type="range" min="-110" max="110" value="0" id="rotAdj"></div>
@@ -110,6 +110,7 @@ let state='IDLE', desiredFoot='auto', frozen=false, mirror=false, showGuide=true
 let lastVideoTime=-1, lastMetrics=null, lockProgressMs=0, lastFrameMs=performance.now();
 let stableFrames=[], currentTransform={x:0,y:0,z:0,scale:1,rz:0,rx:0,ry:0};
 let footSelected='auto', trackingStarted=false;
+let lockedScale=null, lockedFootLengthPx=null, lockedManualScaleAdj=1;
 const LOCK_MS=3600;
 
 const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true});
@@ -239,10 +240,33 @@ function stability(m){
   const movement=Math.hypot(range(xs),range(ys))+range(ls)+Math.min(da,Math.PI*2-da)*80;
   return clamp(1-movement/120,0,1);
 }
+function median(values){
+  const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
+  if(!a.length)return 0;
+  const mid=Math.floor(a.length/2);
+  return a.length%2?a[mid]:(a[mid-1]+a[mid])*.5;
+}
+function currentScaleAdj(){return getVal('scaleAdj',100)||1;}
+function rawScaleFromLength(lengthPx){return (lengthPx/Math.max(anchorLength,0.01));}
+function lockShoeScale(m){
+  // Trava o tamanho do tênis UMA vez, usando a mediana dos últimos frames estáveis.
+  // Depois disso, o tracking só muda posição e rotação, não fica aumentando/diminuindo.
+  const lens=stableFrames.map(f=>f.len).filter(v=>v>20);
+  lockedFootLengthPx=median(lens)||m.length;
+  lockedManualScaleAdj=currentScaleAdj();
+  lockedScale=rawScaleFromLength(lockedFootLengthPx)*lockedManualScaleAdj;
+  return lockedScale;
+}
+function updateLockedScaleFromSlider(){
+  if(lockedFootLengthPx){
+    lockedManualScaleAdj=currentScaleAdj();
+    lockedScale=rawScaleFromLength(lockedFootLengthPx)*lockedManualScaleAdj;
+  }
+}
 function targetFromMetrics(m){
-  const scaleAdj=getVal('scaleAdj',100)||1, xAdj=getVal('xAdj',1), yAdj=getVal('yAdj',1), rotAdj=deg(getVal('rotAdj',1)), pitchAdj=deg(getVal('pitchAdj',1)), yawAdj=deg(getVal('yawAdj',1));
+  const scaleAdj=currentScaleAdj(), xAdj=getVal('xAdj',1), yAdj=getVal('yAdj',1), rotAdj=deg(getVal('rotAdj',1)), pitchAdj=deg(getVal('pitchAdj',1)), yawAdj=deg(getVal('yawAdj',1));
   const W=guideCanvas.width,H=guideCanvas.height;
-  const baseScale=(m.length/Math.max(anchorLength,0.01))*scaleAdj;
+  const baseScale=lockedScale ?? (rawScaleFromLength(m.length)*scaleAdj);
   return {x:m.center.x-W/2+xAdj,y:H/2-m.center.y-yAdj,z:0,scale:baseScale,rz:-m.rz+rotAdj,rx:pitchAdj+clamp(m.worldPitch*.10,-.55,.55),ry:yawAdj+clamp(m.worldYaw*.65,-.8,.8)};
 }
 function applyTransform(t,force=false){
@@ -260,8 +284,8 @@ function drawGuide(m){
   [[m.heel,'calcanhar'],[m.toe,'ponta'],[m.ankle,'tornozelo']].forEach(([p,label])=>{gctx.beginPath();gctx.arc(p.x,p.y,7,0,Math.PI*2);gctx.fill();gctx.font='700 11px Montserrat';gctx.fillText(label,p.x+10,p.y-8);});
   gctx.restore();
 }
-function recalibrate(){lockProgressMs=0;stableFrames=[];shoeRoot.visible=false;targetGuide.classList.remove('locked');trackingStarted=false;setState('SEARCHING_FOOT','Coloque pé + tornozelo na mira');status('Mantenha parado até travar');lockProgress.style.width='0%';hud.classList.remove('collapsed');}
-function forceLock(){if(lastMetrics){const t=targetFromMetrics(lastMetrics);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Travado manualmente • seguindo pé');status('Tênis calçado • mova devagar');lockProgress.style.width='100%';hud.classList.add('collapsed');}else{shoeRoot.visible=true;setState('LIVE_TRACKING','Modo manual • ajuste pelos controles');hud.classList.remove('collapsed');}}
+function recalibrate(){lockProgressMs=0;stableFrames=[];lockedScale=null;lockedFootLengthPx=null;lockedManualScaleAdj=currentScaleAdj();shoeRoot.visible=false;targetGuide.classList.remove('locked');trackingStarted=false;setState('SEARCHING_FOOT','Coloque pé + tornozelo na mira');status('Mantenha parado até travar o tamanho real');lockProgress.style.width='0%';hud.classList.remove('collapsed');}
+function forceLock(){if(lastMetrics){lockShoeScale(lastMetrics);const t=targetFromMetrics(lastMetrics);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Travado manualmente • tamanho fixo');status('Tênis calçado • tamanho travado no pé');lockProgress.style.width='100%';hud.classList.add('collapsed');}else{shoeRoot.visible=true;setState('LIVE_TRACKING','Modo manual • ajuste pelos controles');hud.classList.remove('collapsed');}}
 function loop(now){
   resize(); const dt=Math.min(100,now-lastFrameMs); lastFrameMs=now; let m=null;
   if(poseReady&&video.readyState>=2&&video.currentTime!==lastVideoTime){lastVideoTime=video.currentTime;try{m=chooseFoot(poseLandmarker.detectForVideo(video,now));}catch(e){poseError=e?.message||String(e);}}
@@ -274,15 +298,15 @@ function loop(now){
       else {lockProgressMs=Math.max(0,lockProgressMs-dt*.7);setState('SEARCHING_FOOT','Mostre pé + tornozelo dentro da mira');}
       lockProgressMs=clamp(lockProgressMs,0,LOCK_MS); lockProgress.style.width=`${Math.round(lockProgressMs/LOCK_MS*100)}%`;
       status(m.inside?`Leitura boa • estabilidade ${Math.round(stab*100)}%`:'Centralize o pé e deixe tornozelo visível');
-      if(lockProgressMs>=LOCK_MS){const t=targetFromMetrics(m);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Pé travado • tênis acompanhando');status('Tênis calçado • vire o pé devagar');hud.classList.add('collapsed');}
+      if(lockProgressMs>=LOCK_MS){lockShoeScale(m);const t=targetFromMetrics(m);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Pé travado • tamanho fixo');status('Tênis calçado no tamanho do pé • vire devagar');hud.classList.add('collapsed');}
     }else if(state==='LIVE_TRACKING'){
-      applyTransform(targetFromMetrics(m),false); lockProgress.style.width='100%'; status(`Seguindo pé ${m.side==='left'?'esquerdo':'direito'} automaticamente`);
+      applyTransform(targetFromMetrics(m),false); lockProgress.style.width='100%'; status(`Seguindo pé ${m.side==='left'?'esquerdo':'direito'} • tamanho fixo travado`);
     }
   }else if(!m&&state!=='IDLE'){
     if(state==='LIVE_TRACKING')status('Pé saiu da câmera • mantendo última posição'); else status(poseReady?'Procurando pé e tornozelo...':'IA indisponível • use Travar agora/manual');
   }
   renderer.render(scene,camera);
-  debug({state,poseReady,poseError,footSelected,metrics:lastMetrics&&{side:lastMetrics.side,inside:lastMetrics.inside,len:Math.round(lastMetrics.length),vis:+lastMetrics.vis.toFixed(2),angle:+lastMetrics.rz.toFixed(2)},transform:{x:Math.round(currentTransform.x),y:Math.round(currentTransform.y),scale:+currentTransform.scale.toFixed(2),rz:+currentTransform.rz.toFixed(2)}});
+  debug({state,poseReady,poseError,footSelected,metrics:lastMetrics&&{side:lastMetrics.side,inside:lastMetrics.inside,len:Math.round(lastMetrics.length),vis:+lastMetrics.vis.toFixed(2),angle:+lastMetrics.rz.toFixed(2)},transform:{x:Math.round(currentTransform.x),y:Math.round(currentTransform.y),scale:+currentTransform.scale.toFixed(2),lockedScale:lockedScale&&+lockedScale.toFixed(2),lockedFootLengthPx:lockedFootLengthPx&&Math.round(lockedFootLengthPx),rz:+currentTransform.rz.toFixed(2)}});
   requestAnimationFrame(loop);
 }
 async function takePhoto(){const W=guideCanvas.width,H=guideCanvas.height,c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');const vw=video.videoWidth||W,vh=video.videoHeight||H,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2;ctx.drawImage(video,ox,oy,dw,dh);ctx.drawImage(canvas,0,0,W,H);ctx.drawImage(guideCanvas,0,0,W,H);const a=document.createElement('a');a.download='corre4-provador-pe.png';a.href=c.toDataURL('image/png');a.click();}
@@ -294,7 +318,7 @@ $('#switchCameraBtn').addEventListener('click',async()=>{cameraFacing=cameraFaci
 $('#mirrorBtn').addEventListener('click',()=>{mirror=!mirror;video.classList.toggle('mirror',mirror);$('#mirrorBtn').classList.toggle('active',mirror);});
 $('#guideBtn').addEventListener('click',()=>{showGuide=!showGuide;targetGuide.style.display=showGuide?'block':'none';$('#lockRing').style.display=showGuide?'block':'none';$('#guideBtn').classList.toggle('active',showGuide);});
 $$('.chip[data-foot]').forEach(b=>b.addEventListener('click',()=>{$$('.chip[data-foot]').forEach(x=>x.classList.remove('active'));b.classList.add('active');desiredFoot=b.dataset.foot;recalibrate();}));
-['scaleAdj','yAdj','xAdj','rotAdj','pitchAdj','yawAdj','opacityAdj','smoothAdj'].forEach(id=>$('#'+id)?.addEventListener('input',()=>{if(lastMetrics){applyTransform(targetFromMetrics(lastMetrics),false);}}));
+['scaleAdj','yAdj','xAdj','rotAdj','pitchAdj','yawAdj','opacityAdj','smoothAdj'].forEach(id=>$('#'+id)?.addEventListener('input',()=>{if(id==='scaleAdj')updateLockedScaleFromSlider(); if(lastMetrics){applyTransform(targetFromMetrics(lastMetrics),false);}}));
 setState('IDLE','Toque em Abrir câmera'); status('Toque em Abrir câmera agora');
 </script>
 </body>
