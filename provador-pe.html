@@ -2,324 +2,65 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-<title>IA no Pé • Corre 4 AR Pro</title>
-<meta name="theme-color" content="#000000" />
-<link rel="preconnect" href="https://unpkg.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>Corre 4 • Provador Mobile por Mira</title>
+<meta name="theme-color" content="#050915" />
 <style>
-/* Correção específica do provador: mobile-first, controles recolhíveis e mira livre */
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Montserrat,system-ui,-apple-system,Segoe UI,sans-serif;color:#fff;overscroll-behavior:none;touch-action:none}
-.foot-body{height:100dvh;overflow:hidden;background:#000}.foot-stage{position:fixed;inset:0;background:#000;overflow:hidden}.foot-stage video,.foot-stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.foot-stage video{z-index:1;background:#000}.foot-stage video.mirror{transform:scaleX(-1)}#arCanvas{z-index:3;pointer-events:none}#guideCanvas{z-index:4;pointer-events:none}
-.target-guide{position:fixed;z-index:5;left:50%;top:50%;width:min(76vw,460px);height:min(46vh,330px);transform:translate(-50%,-50%);border:3px dashed rgba(246,200,79,.86);border-radius:54% 54% 48% 48%/62% 62% 42% 42%;box-shadow:0 0 0 9999px rgba(0,0,0,.12),0 0 42px rgba(246,200,79,.20);pointer-events:none}.target-guide:before{content:"PÉ + TORNOZELO AQUI";position:absolute;left:50%;top:-42px;transform:translateX(-50%);white-space:nowrap;border-radius:999px;padding:9px 13px;background:rgba(3,9,18,.78);border:1px solid rgba(255,255,255,.14);font-weight:950;color:#ffeaa1;font-size:12px;letter-spacing:.04em}.target-guide.locked{border-color:rgba(24,199,125,.95);box-shadow:0 0 0 9999px rgba(0,0,0,.06),0 0 50px rgba(24,199,125,.35)}
-.lock-ring{position:fixed;z-index:6;left:50%;top:50%;width:min(74vw,520px);max-width:520px;transform:translate(-50%,-50%);pointer-events:none}.progress{height:12px;border-radius:999px;background:rgba(255,255,255,.15);overflow:hidden;border:1px solid rgba(255,255,255,.18)}.progress b{display:block;height:100%;width:0%;background:linear-gradient(90deg,#18c77d,#f6c84f);transition:width .12s linear}.track-label{margin-top:10px;text-align:center;font-weight:950;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.9);font-size:13px}.quality-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 10px;background:rgba(4,10,18,.68);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:900;color:#dbeaff}.dot{width:9px;height:9px;border-radius:99px;background:#f45454;box-shadow:0 0 16px rgba(244,84,84,.6)}.dot.ok{background:#18c77d;box-shadow:0 0 16px rgba(24,199,125,.65)}
-.hud-top{position:fixed;z-index:25;top:calc(env(safe-area-inset-top) + 8px);left:8px;right:8px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;pointer-events:none}.hud-top>*{pointer-events:auto}.panel{border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(4,10,18,.64);backdrop-filter:blur(14px);box-shadow:0 16px 50px rgba(0,0,0,.28);padding:10px}.panel h1{font-size:15px;line-height:1.05;margin:0 0 3px}.panel p{font-size:11px;color:#d5e7ff;line-height:1.25;margin:0}.top-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.btn,button{min-height:38px;border:0;border-radius:14px;background:linear-gradient(180deg,#244265,#162b46);color:#fff;font-family:inherit;font-weight:950;cursor:pointer;padding:0 12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);touch-action:manipulation}.btn.small,button.small{min-height:34px;font-size:12px;padding:0 10px}.btn.gold,.gold{background:linear-gradient(180deg,#ffe16b,#c99816);color:#160f03}.btn.green,.green{background:linear-gradient(180deg,#19cc81,#0b8d58)}.btn.blue,.blue{background:linear-gradient(180deg,#4aa3ff,#176cc4)}.btn.ghost,.ghost{background:rgba(255,255,255,.08)}a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-.hud{position:fixed;z-index:24;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);display:grid;gap:8px;max-height:48dvh;overflow:auto;pointer-events:auto;transition:transform .25s ease,opacity .25s ease;will-change:transform}.hud.collapsed{transform:translateY(calc(100% - 50px))}.drawer-toggle{position:sticky;top:0;z-index:2;width:100%;min-height:42px;border-radius:18px;background:linear-gradient(180deg,rgba(255,227,109,.96),rgba(201,152,22,.96));color:#160f03}.controls-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.sliders{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.slider-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:9px}.slider-card label{display:block;font-size:10px;color:#cde0f8;font-weight:950;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}.slider-card input{width:100%;accent-color:#f6c84f}.toggle-row{display:flex;gap:8px;flex-wrap:wrap}.chip{min-height:34px;border-radius:12px;background:rgba(255,255,255,.08);padding:0 10px;font-size:12px}.chip.active{background:linear-gradient(180deg,#ffe36d,#d3a218);color:#1b1404}.hint-card{font-size:12px;line-height:1.45;color:#d9e8fb}.debug{position:fixed;z-index:26;left:8px;bottom:60px;max-width:min(460px,calc(100vw - 16px));font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#b9cce4;background:rgba(5,12,22,.78);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:9px;display:none;white-space:pre-wrap;max-height:42vh;overflow:auto}.debug.show{display:block}.loading{position:fixed;z-index:40;inset:0;background:radial-gradient(circle,#12294a,#02060c);display:grid;place-items:center;text-align:center;padding:24px}.loading.hide{display:none}.loading-card{border:1px solid rgba(255,255,255,.13);border-radius:28px;padding:24px;background:rgba(255,255,255,.07);max-width:460px;box-shadow:0 30px 90px rgba(0,0,0,.45)}.loading-card h1{font-size:30px;margin:0 0 10px}.loading-card p{color:#cdddf0;line-height:1.5;margin:0 0 14px;font-size:14px}
-@media(max-width:700px){.hud-top{grid-template-columns:1fr;gap:6px}.top-actions{justify-content:flex-start}.top-actions .btn:not(.gold),.top-actions button:not(.gold){min-height:32px;font-size:11px}.hud{max-height:54dvh}.controls-grid{grid-template-columns:1fr 1fr}.sliders{grid-template-columns:1fr 1fr}.target-guide{width:82vw;height:45vh;top:48%}.lock-ring{top:48%;width:82vw}.target-guide:before{font-size:10px}.panel{border-radius:16px}.loading-card{border-radius:24px}}
-@media(max-width:420px){.sliders{grid-template-columns:1fr 1fr}.controls-grid{grid-template-columns:1fr 1fr}.btn,button{font-size:12px}.hud.collapsed{transform:translateY(calc(100% - 46px))}}
+:root{--bg:#050915;--glass:rgba(5,10,20,.76);--glass2:rgba(8,16,30,.90);--line:rgba(255,255,255,.14);--text:#f4f8ff;--muted:#b6c6dc;--gold:#f5c83b;--green:#18c77b;--blue:#3298ff;--red:#ff4a66}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050915;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button{font-family:inherit}
+#stage{position:fixed;inset:0;overflow:hidden;background:#050915}video,#shoeCanvas,#debugCanvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}video{z-index:1;background:#10131d}#shoeCanvas{z-index:3;pointer-events:none}#debugCanvas{z-index:4;pointer-events:none}.shade{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 50% 52%,transparent 0 32%,rgba(0,0,0,.06) 68%,rgba(0,0,0,.22) 100%)}
+.top{position:absolute;z-index:12;top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}.brand{pointer-events:auto;max-width:52vw;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(14px);border-radius:16px;padding:9px 11px;box-shadow:0 12px 32px rgba(0,0,0,.28)}.brand h1{font-size:14px;line-height:1.05;margin:0 0 3px;font-weight:950}.brand p{font-size:11px;line-height:1.22;margin:0;color:var(--muted);font-weight:750}.topBtns{display:flex;gap:6px;pointer-events:auto}.topBtns button,.miniBtn{border:1px solid var(--line);background:var(--glass);color:var(--text);border-radius:12px;min-height:34px;padding:0 10px;font-size:11px;font-weight:950}.topBtns .gold{border:0;background:linear-gradient(#ffdc55,#d6aa1d);color:#171100}.topBtns .blue{background:#123052}
+.aim{position:absolute;z-index:5;left:50%;top:50%;width:min(76vw,430px);height:min(47vh,390px);transform:translate(-50%,-50%) rotate(var(--aim-rot,0deg));pointer-events:none;transition:.18s ease}.aim.hidden{display:none}.aim::before{content:"";position:absolute;inset:0;border:3px dashed rgba(245,200,59,.86);border-radius:52% 52% 46% 46%;box-shadow:0 0 0 9999px rgba(0,0,0,.03),0 0 42px rgba(245,200,59,.12)}.aim.locked::before{border-color:rgba(24,199,123,.92);box-shadow:0 0 42px rgba(24,199,123,.2)}.aim .toe{position:absolute;left:50%;top:-15px;transform:translateX(-50%);background:rgba(245,200,59,.96);color:#181200;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:950;white-space:nowrap}.aim .heel{position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);background:rgba(5,10,20,.84);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;color:#dce8fb;white-space:nowrap}.aim .centerLine{position:absolute;left:50%;top:4%;bottom:4%;width:2px;background:linear-gradient(transparent,rgba(255,255,255,.8),transparent);transform:translateX(-50%)}.aim .cross{position:absolute;left:50%;top:50%;width:20px;height:20px;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.9);border-radius:50%;background:rgba(24,199,123,.15)}
+.guide{position:absolute;z-index:9;left:50%;top:calc(50% + min(26vh,225px));transform:translateX(-50%);width:min(90vw,510px);pointer-events:none;text-align:center}.guide .msg{display:inline-block;background:rgba(5,10,20,.82);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:950;text-shadow:0 2px 10px #000}.points{margin-top:6px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap}.chip{background:rgba(5,10,20,.78);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:5px 7px;font-size:9px;font-weight:950;color:#d4e3f6}.chip.ok{background:rgba(24,199,123,.23);border-color:rgba(24,199,123,.8);color:#dfffee}.chip.bad{background:rgba(255,74,102,.18);border-color:rgba(255,74,102,.42);color:#ffe1e6}
+.bottom{position:absolute;z-index:20;left:max(7px,env(safe-area-inset-left));right:max(7px,env(safe-area-inset-right));bottom:max(7px,env(safe-area-inset-bottom));display:grid;gap:6px;pointer-events:none}.primaryBar{pointer-events:auto;background:rgba(5,10,20,.84);border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:7px;display:grid;grid-template-columns:1.28fr 1.1fr .82fr .82fr;gap:5px;backdrop-filter:blur(16px)}.primaryBar button{border:0;border-radius:13px;min-height:40px;color:#fff;font-weight:950;font-size:11px;padding:0 6px}.primaryBar .start{background:linear-gradient(#19d98a,#0d9d5f)}.primaryBar .cal{background:linear-gradient(#ffdd55,#d5aa1e);color:#171100}.primaryBar .photo{background:linear-gradient(#43a9ff,#146dc7)}.primaryBar .settings{background:#172942}.quickBar{pointer-events:auto;background:rgba(5,10,20,.70);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:6px;display:flex;gap:5px;overflow-x:auto;backdrop-filter:blur(14px);scrollbar-width:none}.quickBar::-webkit-scrollbar{display:none}.quickBar button{border:0;border-radius:12px;min-height:31px;padding:0 11px;font-size:10px;font-weight:950;color:#edf5ff;background:rgba(255,255,255,.12);white-space:nowrap}.quickBar button.active{background:linear-gradient(#ffdd55,#d5aa1e);color:#171100}.drawer{pointer-events:auto;display:none;background:rgba(5,10,20,.91);border:1px solid var(--line);border-radius:18px;padding:9px;grid-template-columns:1fr 1fr;gap:8px;backdrop-filter:blur(18px);max-height:45vh;overflow:auto}.drawer.open{display:grid}.ctl{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:9px}.ctl label{display:flex;justify-content:space-between;gap:7px;margin-bottom:5px;color:#cbd8ea;font-size:9px;text-transform:uppercase;letter-spacing:.06em;font-weight:950}.ctl input{width:100%;accent-color:var(--gold)}
+.toast{display:none;position:absolute;z-index:30;left:50%;top:50%;transform:translate(-50%,-50%);max-width:86vw;text-align:center;background:rgba(5,10,20,.94);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:15px 17px;font-size:14px;line-height:1.36;font-weight:850;box-shadow:0 20px 60px rgba(0,0,0,.45)}.toast.show{display:block}.debugBox{display:none;position:absolute;z-index:18;right:8px;top:70px;width:min(92vw,360px);max-height:50vh;overflow:auto;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:9px;font:11px/1.38 ui-monospace,Consolas,monospace;white-space:pre-wrap}.debugBox.show{display:block}
+@media(max-width:440px){.brand{max-width:42vw;padding:7px 8px;border-radius:14px}.brand h1{font-size:11px}.brand p{font-size:9px}.topBtns button{min-height:30px;padding:0 7px;font-size:10px}.aim{width:78vw;height:39vh;top:48%}.aim .toe{font-size:10px;top:-12px;padding:5px 9px}.aim .heel{font-size:9px;bottom:-12px}.guide{top:calc(48% + 22vh)}.guide .msg{font-size:10px;padding:6px 9px}.chip{font-size:8px;padding:4px 6px}.primaryBar{grid-template-columns:1.15fr 1fr .78fr .82fr;border-radius:15px;padding:5px}.primaryBar button{min-height:35px;border-radius:11px;font-size:10px}.quickBar{padding:5px}.quickBar button{min-height:29px;font-size:9px;padding:0 9px}.drawer{gap:6px;padding:7px}.ctl{padding:7px}.ctl label{font-size:8px}.toast{font-size:12px}}
 </style>
-<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
-<body class="foot-body">
-<div class="foot-stage" id="stage">
-  <video id="video" autoplay playsinline muted></video>
-  <canvas id="arCanvas"></canvas>
-  <canvas id="guideCanvas"></canvas>
-  <div class="target-guide" id="targetGuide"></div>
-  <div class="lock-ring" id="lockRing">
-    <div class="progress"><b id="lockProgress"></b></div>
-    <div class="track-label" id="trackLabel">Aguardando câmera</div>
-  </div>
+<body>
+<div id="stage">
+  <video id="video" autoplay playsinline muted></video><div class="shade"></div><canvas id="shoeCanvas"></canvas><canvas id="debugCanvas"></canvas>
+  <div class="top"><div class="brand"><h1>Corre 4 • Mira Mobile</h1><p id="statusText">Abra a câmera e calibre pela mira</p></div><div class="topBtns"><button id="homeBtn">Início</button><button class="blue" id="debugBtn">Pontos</button><button class="gold" id="resetBtn">Reset</button></div></div>
+  <div class="aim" id="aim"><div class="toe">PONTA DO PÉ</div><div class="centerLine"></div><div class="cross"></div><div class="heel">CALCANHAR</div></div>
+  <div class="guide"><div class="msg" id="guideMsg">Coloque o pé dentro da mira e toque em “Calibrar pela mira”</div><div class="points"><span class="chip bad" id="chipMode">MIRA</span><span class="chip bad" id="chipToe">PONTA</span><span class="chip bad" id="chipHeel">CALCANHAR</span><span class="chip bad" id="chipAnkle">TORNOZELO</span><span class="chip bad" id="chipFollow">SEGUIR</span></div></div>
+  <div class="bottom"><div class="primaryBar"><button class="start" id="cameraBtn">Abrir câmera</button><button class="cal" id="calibrateBtn">Calibrar pela mira</button><button class="photo" id="photoBtn">Foto</button><button class="settings" id="settingsBtn">Ajustes</button></div><div class="quickBar"><button class="active" id="miraModeBtn">Modo mira</button><button id="followBtn">Seguir IA</button><button id="aimBtn" class="active">Mira</button><button id="mirrorBtn">Espelhar</button><button id="camBtn">Trocar câmera</button><button id="rotLeftBtn">↶</button><button id="rotRightBtn">↷</button></div><div class="drawer" id="drawer"><div class="ctl"><label>Cobertura <span id="vCover">112%</span></label><input id="cover" type="range" min="80" max="155" value="112"></div><div class="ctl"><label>Tamanho mira <span id="vAim">100%</span></label><input id="aimSize" type="range" min="70" max="130" value="100"></div><div class="ctl"><label>Altura <span id="vY">0</span></label><input id="offY" type="range" min="-180" max="180" value="0"></div><div class="ctl"><label>Lateral <span id="vX">0</span></label><input id="offX" type="range" min="-180" max="180" value="0"></div><div class="ctl"><label>Rotação <span id="vRot">0°</span></label><input id="rot" type="range" min="-180" max="180" value="0"></div><div class="ctl"><label>Opacidade <span id="vOp">96%</span></label><input id="opacity" type="range" min="45" max="100" value="96"></div><div class="ctl"><label>Suavização <span id="vSmooth">72%</span></label><input id="smooth" type="range" min="5" max="95" value="72"></div><div class="ctl"><label>Pitch visual <span id="vPitch">0°</span></label><input id="pitch" type="range" min="-80" max="80" value="0"></div></div></div>
+  <div class="toast" id="toast"></div><div class="debugBox" id="debugBox"></div>
 </div>
-
-<div class="loading" id="loading">
-  <div class="loading-card">
-    <h1>IA no Pé</h1>
-    <p>Abra a câmera, enquadre o <b>pé inteiro com o tornozelo/canela aparecendo</b> dentro da mira e mantenha parado até travar.</p>
-    <button class="btn gold" id="openCameraBtn">Abrir câmera agora</button>
-    <p id="loadMsg" style="font-size:12px;margin-top:12px;color:#a9bdd5">O navegador vai pedir permissão de câmera.</p>
-  </div>
-</div>
-
-<div class="hud-top">
-  <div class="panel">
-    <h1>Corre 4 • Provador no Pé</h1>
-    <p id="stateText">Toque em Abrir câmera</p>
-    <div style="margin-top:7px"><span class="quality-pill"><i class="dot" id="qualityDot"></i><span id="qualityText">sem leitura</span></span></div>
-  </div>
-  <div class="top-actions">
-    <a class="btn small ghost" href="index.html">Início</a>
-    <button class="btn small ghost" id="debugBtn">Debug</button>
-    <button class="btn small ghost" id="collapseBtn">Ajustes</button>
-    <button class="btn small gold" id="recalibrateBtn">Recalibrar</button>
-  </div>
-</div>
-
-<div class="hud collapsed" id="hud">
-  <button class="drawer-toggle" id="drawerToggle">▲ Ajustes e controles</button>
-  <div class="panel hint-card" id="hintBox"><b>Dica:</b> o MediaPipe precisa ver o pé e o tornozelo. Se enquadrar só a ponta do pé, ele pode não encontrar os pontos.</div>
-  <div class="panel">
-    <div class="controls-grid">
-      <button class="btn green" id="lockBtn">Travar agora</button>
-      <button class="btn" id="freezeBtn">Congelar</button>
-      <button class="btn blue" id="photoBtn">Foto</button>
-      <button class="btn ghost" id="switchCameraBtn">Trocar câmera</button>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="toggle-row">
-      <button class="chip active" data-foot="auto">Pé automático</button>
-      <button class="chip" data-foot="left">Esquerdo</button>
-      <button class="chip" data-foot="right">Direito</button>
-      <button class="chip" id="mirrorBtn">Espelhar</button>
-      <button class="chip active" id="guideBtn">Mira</button>
-    </div>
-  </div>
-  <div class="panel sliders">
-    <div class="slider-card"><label>Tamanho fixo</label><input type="range" min="55" max="180" value="110" id="scaleAdj"></div>
-    <div class="slider-card"><label>Altura</label><input type="range" min="-130" max="130" value="-20" id="yAdj"></div>
-    <div class="slider-card"><label>Lateral</label><input type="range" min="-140" max="140" value="0" id="xAdj"></div>
-    <div class="slider-card"><label>Rotação</label><input type="range" min="-110" max="110" value="0" id="rotAdj"></div>
-    <div class="slider-card"><label>Suavização</label><input type="range" min="8" max="60" value="26" id="smoothAdj"></div>
-    <div class="slider-card"><label>Opacidade</label><input type="range" min="35" max="100" value="93" id="opacityAdj"></div>
-    <div class="slider-card"><label>Inclinação</label><input type="range" min="-70" max="70" value="-10" id="pitchAdj"></div>
-    <div class="slider-card"><label>Perspectiva</label><input type="range" min="-70" max="70" value="0" id="yawAdj"></div>
-  </div>
-</div>
-
-<pre class="debug" id="debugBox"></pre>
-<script src="assets/js/product-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script type="module">
-import { PoseLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
-
-const $ = (s)=>document.querySelector(s);
-const $$ = (s)=>Array.from(document.querySelectorAll(s));
-const video=$('#video'), canvas=$('#arCanvas'), guideCanvas=$('#guideCanvas'), stage=$('#stage');
-const loading=$('#loading'), loadMsg=$('#loadMsg'), stateText=$('#stateText');
-const lockProgress=$('#lockProgress'), trackLabel=$('#trackLabel'), targetGuide=$('#targetGuide');
-const debugBox=$('#debugBox'), hud=$('#hud'), qualityDot=$('#qualityDot'), qualityText=$('#qualityText');
-const gctx=guideCanvas.getContext('2d');
-
-let stream=null, cameraFacing='environment';
-let poseLandmarker=null, poseReady=false, poseError='';
-let state='IDLE', desiredFoot='auto', frozen=false, mirror=false, showGuide=true;
-let lastVideoTime=-1, lastMetrics=null, lockProgressMs=0, lastFrameMs=performance.now();
-let stableFrames=[], currentTransform={x:0,y:0,z:0,scale:1,rz:0,rx:0,ry:0};
-let footSelected='auto', trackingStarted=false;
-let lockedScale=null, lockedFootLengthPx=null, lockedManualScaleAdj=1;
-const LOCK_MS=3600;
-
-const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-renderer.outputEncoding=THREE.sRGBEncoding;
-const scene=new THREE.Scene();
-const camera=new THREE.OrthographicCamera(-1,1,1,-1,-1000,1000); camera.position.z=100;
-scene.add(new THREE.HemisphereLight(0xffffff,0x224466,1.7));
-const key=new THREE.DirectionalLight(0xffffff,1.9); key.position.set(0,0,200); scene.add(key);
-let shoeRoot=new THREE.Group(); scene.add(shoeRoot);
-let shoeModel=null, bboxSize=new THREE.Vector3(1,1,1), bboxCenter=new THREE.Vector3();
-let anchorLength=1, anchorMid=new THREE.Vector3(0,0,0);
-
-function setState(s,msg){state=s; stateText.textContent=msg||s;}
-function status(msg){trackLabel.textContent=msg;}
-function getVal(id,div=1){return Number($('#'+id)?.value||0)/div;}
-function deg(v){return v*Math.PI/180;}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-function lerp(a,b,t){return a+(b-a)*t;}
-function lerpAngle(a,b,t){let d=((b-a+Math.PI)%(Math.PI*2))-Math.PI; return a+d*t;}
-function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
-function angle(a,b){return Math.atan2(b.y-a.y,b.x-a.x);}
-function debug(obj){if(!debugBox.classList.contains('show'))return; debugBox.textContent=typeof obj==='string'?obj:JSON.stringify(obj,null,2);}
-
-function resize(){
-  const w=stage.clientWidth, h=stage.clientHeight;
-  renderer.setSize(w,h,false); guideCanvas.width=w; guideCanvas.height=h;
-  camera.left=-w/2; camera.right=w/2; camera.top=h/2; camera.bottom=-h/2; camera.updateProjectionMatrix();
+import { FilesetResolver, PoseLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+const $=id=>document.getElementById(id);const video=$('video'),canvas=$('shoeCanvas'),debugCanvas=$('debugCanvas'),dbg=debugCanvas.getContext('2d');
+const statusText=$('statusText'),guideMsg=$('guideMsg'),aim=$('aim'),toast=$('toast'),debugBox=$('debugBox');
+const chip={mode:$('chipMode'),toe:$('chipToe'),heel:$('chipHeel'),ankle:$('chipAnkle'),follow:$('chipFollow')};
+let cameraMode='environment',mirror=false,showAim=true,debug=false,pose=null,lastVideoTime=-1,tracking=false,calibrated=false,followAI=false;
+let renderer,scene,camera,loader,shoeRoot=null,modelLength=1,smoothPose=null,lastFoot=null,raf=0;
+const cfg={cover:1.12,aimScale:1,offX:0,offY:0,rot:0,opacity:.96,smooth:.72,pitch:0,aimRot:0};
+function msg(t){statusText.textContent=t}function guide(t){guideMsg.textContent=t}function showToast(t,ms=1800){toast.textContent=t;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),ms)}function ok(el,v){el.classList.toggle('ok',!!v);el.classList.toggle('bad',!v)}
+function resize(){const w=innerWidth,h=innerHeight;canvas.width=w;canvas.height=h;debugCanvas.width=w;debugCanvas.height=h;if(renderer){renderer.setSize(w,h,false);camera.left=-w/2;camera.right=w/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix()}applyAimSize()}addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));
+async function openCamera(){try{if(video.srcObject)video.srcObject.getTracks().forEach(t=>t.stop());const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:cameraMode},width:{ideal:1280},height:{ideal:720}}});video.srcObject=stream;await video.play();resize();msg('Câmera pronta • coloque o pé na mira');guide('Coloque o pé dentro da mira e toque em “Calibrar pela mira”');showToast('Câmera aberta');return true}catch(e){try{const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:true});video.srcObject=stream;await video.play();resize();msg('Câmera aberta em modo compatível');return true}catch(err){showToast('Não abriu a câmera. Use HTTPS e permita a câmera.');msg('Erro ao abrir câmera');return false}}}
+async function loadPose(){if(pose)return pose;msg('Carregando IA para seguir o pé...');const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');const models=[['full','GPU','https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task'],['full','CPU','https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task'],['lite','GPU','https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task'],['lite','CPU','https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task']];let last;for(const [n,d,p] of models){try{pose=await PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:p,delegate:d},runningMode:'VIDEO',numPoses:1,minPoseDetectionConfidence:.22,minPosePresenceConfidence:.22,minTrackingConfidence:.22});msg(`IA carregada (${n}/${d})`);return pose}catch(e){last=e}}throw last}
+function initThree(){renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.outputEncoding=THREE.sRGBEncoding;scene=new THREE.Scene();camera=new THREE.OrthographicCamera(-innerWidth/2,innerWidth/2,innerHeight/2,-innerHeight/2,-2000,2000);camera.position.z=1000;scene.add(new THREE.AmbientLight(0xffffff,1.35));let l=new THREE.DirectionalLight(0xffffff,1.55);l.position.set(0,0,900);scene.add(l);loader=new THREE.GLTFLoader();loader.load('models/corre4.glb',g=>{shoeRoot=g.scene;prep(shoeRoot);scene.add(shoeRoot);shoeRoot.visible=false;msg('Modelo carregado • pronto para calibrar')},undefined,()=>{shoeRoot=fallback();scene.add(shoeRoot);shoeRoot.visible=false;msg('Modelo básico carregado')})}
+function prep(root){const box=new THREE.Box3().setFromObject(root),s=new THREE.Vector3(),c=new THREE.Vector3();box.getSize(s);box.getCenter(c);root.position.sub(c);modelLength=Math.max(s.x,s.y,s.z,.001);root.traverse(o=>{if(o.isMesh&&o.material){o.material.transparent=true;o.material.opacity=cfg.opacity;o.frustumCulled=false}})}
+function fallback(){const g=new THREE.Group(),red=new THREE.MeshStandardMaterial({color:0xd20a22,roughness:.75,transparent:true,opacity:cfg.opacity}),dark=new THREE.MeshStandardMaterial({color:0x4b050b,roughness:.85,transparent:true,opacity:cfg.opacity}),white=new THREE.MeshBasicMaterial({color:0xffffff});const sole=new THREE.Mesh(new THREE.BoxGeometry(300,38,86),dark);sole.position.y=-26;g.add(sole);const upper=new THREE.Mesh(new THREE.BoxGeometry(265,70,72),red);upper.position.y=8;g.add(upper);for(let i=0;i<5;i++){let lace=new THREE.Mesh(new THREE.BoxGeometry(65,6,5),dark);lace.position.set(-35+i*18,48,30);lace.rotation.z=(i%2?.22:-.22);g.add(lace)}const t=txt('CORRE');t.position.set(-25,16,43);g.add(t);modelLength=300;return g}function txt(t){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.font='900 82px Arial';x.fillStyle='#fff';x.fillText(t,20,92);return new THREE.Mesh(new THREE.PlaneGeometry(140,35),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true}))}
+function aimRect(){const r=aim.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height,angle:(cfg.aimRot-90)*Math.PI/180}}
+function world(pt){return{x:pt.x-innerWidth/2,y:-(pt.y-innerHeight/2)}}
+function calibrateByAim(){if(!shoeRoot){showToast('Modelo ainda carregando');return}const r=aimRect();calibrated=true;tracking=true;followAI=false;smoothPose={x:r.x,y:r.y,angle:r.angle,len:r.h*cfg.cover};shoeRoot.visible=true;aim.classList.add('locked');ok(chip.mode,true);ok(chip.follow,false);applyShoe(smoothPose,true);guide('Tênis calçado pela mira. Use “Seguir IA” só se os pontos aparecerem.');msg('Calibrado pela mira • tamanho fixo');showToast('Calibrado pela mira')}
+function lmToScreen(lm){const sw=innerWidth,sh=innerHeight,vw=video.videoWidth||sw,vh=video.videoHeight||sh,va=vw/vh,sa=sw/sh;let dw,dh,cx=0,cy=0;if(sa>va){dw=sw;dh=sw/va;cy=(dh-sh)/2}else{dh=sh;dw=sh*va;cx=(dw-sw)/2}let x=lm.x*dw-cx;if(mirror)x=sw-x;return{x,y:lm.y*dh-cy,z:lm.z||0,ok:(lm.visibility??1)>.22,vis:lm.visibility??1}}
+function getFoot(lms){const sides={left:[27,29,31],right:[28,30,32]};const get=s=>{const a=lmToScreen(lms[sides[s][0]]),h=lmToScreen(lms[sides[s][1]]),t=lmToScreen(lms[sides[s][2]]);const len=Math.hypot(t.x-h.x,t.y-h.y);return{side:s,ankle:a,heel:h,toe:t,len,valid:a.ok&&h.ok&&t.ok&&len>35,score:(a.vis+h.vis+t.vis)/3}};const L=get('left'),R=get('right');return R.valid&&R.score>=L.score?R:L.valid?L:(R.score>L.score?R:L)}
+function metric(f){const vx=f.toe.x-f.heel.x,vy=f.toe.y-f.heel.y,len=Math.hypot(vx,vy);return{center:{x:f.heel.x+vx*.56,y:f.heel.y+vy*.56},angle:Math.atan2(-vy,vx),len,valid:f.valid&&len>35&&len<innerHeight*.85,foot:f}}
+function applyShoe(m,force=false){if(!shoeRoot||!m)return;const s=force?0:cfg.smooth;if(!smoothPose||force)smoothPose={...m};smoothPose.x=smoothPose.x*s+m.center.x*(1-s);smoothPose.y=smoothPose.y*s+m.center.y*(1-s);const da=Math.atan2(Math.sin(m.angle-smoothPose.angle),Math.cos(m.angle-smoothPose.angle));smoothPose.angle+=da*(1-s);const p=world({x:smoothPose.x,y:smoothPose.y});const angle=smoothPose.angle+cfg.rot;const side=angle+Math.PI/2;shoeRoot.position.set(p.x+Math.cos(side)*cfg.offX,p.y+Math.sin(side)*cfg.offX+cfg.offY,0);const scale=(smoothPose.len/(modelLength||300))*cfg.cover;shoeRoot.scale.set(scale,scale,scale);shoeRoot.rotation.set(THREE.Math.degToRad(cfg.pitch),0,angle);shoeRoot.traverse(o=>{if(o.isMesh&&o.material){o.material.opacity=cfg.opacity;o.material.transparent=cfg.opacity<.999}})}
+function drawFoot(f,m){dbg.clearRect(0,0,innerWidth,innerHeight);if(!f)return;const pts=[['PONTA',f.toe,'#f5c83b'],['CALCANHAR',f.heel,'#18c77b'],['TORNOZELO',f.ankle,'#3298ff']];dbg.lineWidth=4;dbg.strokeStyle='rgba(255,255,255,.9)';dbg.beginPath();dbg.moveTo(f.heel.x,f.heel.y);dbg.lineTo(f.toe.x,f.toe.y);dbg.moveTo(f.heel.x,f.heel.y);dbg.lineTo(f.ankle.x,f.ankle.y);dbg.stroke();for(const [label,p,col] of pts){dbg.beginPath();dbg.fillStyle=col;dbg.strokeStyle='#fff';dbg.lineWidth=2;dbg.arc(p.x,p.y,p.ok?8:5,0,Math.PI*2);dbg.fill();dbg.stroke();dbg.fillStyle='rgba(0,0,0,.75)';dbg.font='800 11px Arial';dbg.fillText(label,p.x+10,p.y-8)}if(m&&m.valid){dbg.strokeStyle='rgba(24,199,123,.95)';dbg.lineWidth=2;dbg.beginPath();dbg.ellipse(m.center.x,m.center.y,m.len*.58,m.len*.3,-m.angle,0,Math.PI*2);dbg.stroke()}if(debug)debugBox.textContent=`calibrated=${calibrated}\ntracking=${tracking}\nfollowAI=${followAI}\nfoot=${f.side}\nvalid=${f.valid}\nlen=${m?m.len.toFixed(1):'-'}\naimScale=${cfg.aimScale}\ncover=${cfg.cover}\nmodelLength=${modelLength.toFixed(2)}`}
+async function enableFollow(){if(!calibrated){showToast('Calibre pela mira primeiro');return}try{await loadPose();followAI=!followAI;ok(chip.follow,followAI);$('followBtn').classList.toggle('active',followAI);guide(followAI?'Seguindo por IA quando captar os pontos. Se perder, mantém a mira.':'Modo mira fixo: o tênis fica calibrado na mira.');msg(followAI?'IA seguindo pé quando possível':'Modo mira ativo')}catch(e){showToast('IA não carregou. Modo mira continua funcionando.')}}
+async function loop(){raf=requestAnimationFrame(loop);if(renderer)renderer.render(scene,camera);if(!pose||!video.videoWidth||video.currentTime===lastVideoTime)return;lastVideoTime=video.currentTime;let res;try{res=pose.detectForVideo(video,performance.now())}catch(e){return}const lms=res.landmarks&&res.landmarks[0];if(!lms){ok(chip.toe,false);ok(chip.heel,false);ok(chip.ankle,false);return}const f=getFoot(lms),m=metric(f);lastFoot={f,m};ok(chip.toe,f.toe.ok);ok(chip.heel,f.heel.ok);ok(chip.ankle,f.ankle.ok);drawFoot(f,m);if(followAI&&tracking&&m.valid){applyShoe(m,false);msg(`Seguindo ${f.side==='left'?'pé esquerdo':'pé direito'} • tamanho fixo`)}}
+function applyAimSize(){aim.style.width=`min(${76*cfg.aimScale}vw,${430*cfg.aimScale}px)`;aim.style.height=`min(${47*cfg.aimScale}vh,${390*cfg.aimScale}px)`;aim.style.setProperty('--aim-rot',cfg.aimRot+'deg')}
+function bind(){
+$('cameraBtn').onclick=openCamera;$('calibrateBtn').onclick=calibrateByAim;$('photoBtn').onclick=()=>{const out=document.createElement('canvas');out.width=innerWidth;out.height=innerHeight;const c=out.getContext('2d');c.drawImage(video,0,0,innerWidth,innerHeight);c.drawImage(canvas,0,0);c.drawImage(debugCanvas,0,0);const a=document.createElement('a');a.download='provador-corre4-mira.png';a.href=out.toDataURL('image/png');a.click()};
+$('settingsBtn').onclick=()=>$('drawer').classList.toggle('open');$('homeBtn').onclick=()=>location.href='index.html';$('debugBtn').onclick=()=>{debug=!debug;debugBox.classList.toggle('show',debug);debugCanvas.style.display=debug?'block':'block'};$('resetBtn').onclick=()=>{calibrated=false;tracking=false;followAI=false;smoothPose=null;if(shoeRoot)shoeRoot.visible=false;aim.classList.remove('locked');ok(chip.mode,false);ok(chip.follow,false);guide('Coloque o pé dentro da mira e toque em “Calibrar pela mira”');msg('Resetado')};
+$('followBtn').onclick=enableFollow;$('miraModeBtn').onclick=e=>{followAI=false;ok(chip.follow,false);$('followBtn').classList.remove('active');e.target.classList.add('active');guide('Modo mira: o tênis fica no tamanho e posição da mira.')};$('aimBtn').onclick=e=>{showAim=!showAim;aim.classList.toggle('hidden',!showAim);e.target.classList.toggle('active',showAim)};$('mirrorBtn').onclick=e=>{mirror=!mirror;video.style.transform=mirror?'scaleX(-1)':'none';e.target.classList.toggle('active',mirror)};$('camBtn').onclick=async()=>{cameraMode=cameraMode==='environment'?'user':'environment';await openCamera()};$('rotLeftBtn').onclick=()=>{cfg.aimRot-=10;applyAimSize();if(calibrated)calibrateByAim()};$('rotRightBtn').onclick=()=>{cfg.aimRot+=10;applyAimSize();if(calibrated)calibrateByAim()};
+const m=[['cover','vCover',v=>{cfg.cover=v/100;return v+'%'}],['aimSize','vAim',v=>{cfg.aimScale=v/100;applyAimSize();return v+'%'}],['offY','vY',v=>{cfg.offY=+v;return v}],['offX','vX',v=>{cfg.offX=+v;return v}],['rot','vRot',v=>{cfg.rot=THREE.Math.degToRad(+v);return v+'°'}],['opacity','vOp',v=>{cfg.opacity=v/100;return v+'%'}],['smooth','vSmooth',v=>{cfg.smooth=v/100;return v+'%'}],['pitch','vPitch',v=>{cfg.pitch=+v;return v+'°'}]];for(const [id,out,fn] of m){$(id).oninput=e=>{ $(out).textContent=fn(e.target.value); if(id==='aimSize'&&calibrated)calibrateByAim(); if(calibrated&&smoothPose)applyShoe({center:smoothPose,angle:smoothPose.angle,len:smoothPose.len,valid:true},true)};$(out).textContent=fn($(id).value)}
 }
-window.addEventListener('resize',resize); resize();
-
-async function loadModel(){
-  return new Promise((resolve,reject)=>{
-    const loader=new THREE.GLTFLoader();
-    loader.load('models/corre4.glb', gltf=>{
-      shoeModel=gltf.scene; shoeRoot.clear(); shoeRoot.add(shoeModel);
-      shoeModel.traverse(o=>{if(o.isMesh){o.frustumCulled=false; if(o.material){o.material.transparent=true; o.material.opacity=getVal('opacityAdj',100)||.93;}}});
-      const box=new THREE.Box3().setFromObject(shoeModel); box.getSize(bboxSize); box.getCenter(bboxCenter);
-      shoeModel.position.sub(bboxCenter); shoeModel.updateMatrixWorld(true);
-      const toe=shoeModel.getObjectByName('TOE_ANCHOR'), heel=shoeModel.getObjectByName('HEEL_ANCHOR');
-      if(toe&&heel){
-        const tv=new THREE.Vector3(), hv=new THREE.Vector3(); toe.getWorldPosition(tv); heel.getWorldPosition(hv);
-        anchorLength=Math.max(tv.distanceTo(hv),bboxSize.x,0.01); anchorMid.copy(tv).add(hv).multiplyScalar(.5);
-      }else{
-        anchorLength=Math.max(bboxSize.x,bboxSize.y,bboxSize.z,0.01); anchorMid.set(0,0,0);
-      }
-      shoeRoot.visible=false; resolve();
-    },undefined,reject);
-  });
-}
-
-async function createPose(delegate,model){
-  const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
-  return PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:`https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_${model}/float16/latest/pose_landmarker_${model}.task`,delegate},runningMode:'VIDEO',numPoses:1,minPoseDetectionConfidence:.25,minPosePresenceConfidence:.25,minTrackingConfidence:.25});
-}
-async function initPose(){
-  const tries=[['GPU','full'],['CPU','full'],['GPU','lite'],['CPU','lite']];
-  for(const [delegate,model] of tries){
-    try{loadMsg.textContent=`Carregando IA do pé (${model}/${delegate})...`; poseLandmarker=await createPose(delegate,model); poseReady=true; poseError=''; return;}
-    catch(e){poseError=e?.message||String(e); console.warn('tentativa MediaPipe falhou',delegate,model,e);}
-  }
-  poseReady=false;
-}
-
-async function openCamera(){
-  try{
-    loading.classList.remove('hide'); loadMsg.textContent='Abrindo câmera...';
-    if(!navigator.mediaDevices?.getUserMedia) throw new Error('Câmera indisponível. Abra por HTTPS no celular.');
-    if(stream) stream.getTracks().forEach(t=>t.stop());
-    try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:cameraFacing},width:{ideal:1280},height:{ideal:720}},audio:false});}
-    catch(e){stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
-    video.srcObject=stream; await video.play();
-    await loadModel(); await initPose();
-    video.classList.toggle('mirror',mirror);
-    loading.classList.add('hide');
-    setState('SEARCHING_FOOT',poseReady?'Coloque pé + tornozelo na mira':'Câmera aberta • IA falhou, use travar agora/manual');
-    status(poseReady?'Mostre o pé inteiro e o tornozelo':'IA indisponível: use controles manuais');
-    requestAnimationFrame(loop);
-  }catch(e){loadMsg.textContent='Erro: '+(e?.message||e); setState('ERROR','Erro ao abrir câmera');}
-}
-
-function coverMap(lm){
-  const W=guideCanvas.width, H=guideCanvas.height, vw=video.videoWidth||W, vh=video.videoHeight||H;
-  const sc=Math.max(W/vw,H/vh), dw=vw*sc, dh=vh*sc, ox=(W-dw)/2, oy=(H-dh)/2;
-  let x=ox+(lm.x||0)*dw, y=oy+(lm.y||0)*dh; if(mirror) x=W-x;
-  return {x,y,z:lm.z||0,visibility:lm.visibility??1,presence:lm.presence??1};
-}
-function inViewport(p){const W=guideCanvas.width,H=guideCanvas.height;return p.x>-W*.2&&p.x<W*1.2&&p.y>-H*.2&&p.y<H*1.2;}
-function insideTarget(m){
-  const W=guideCanvas.width,H=guideCanvas.height,cx=W/2,cy=H*.50,rx=Math.min(W*.82,460)/2,ry=Math.min(H*.45,330)/2;
-  const n=((m.center.x-cx)**2)/(rx*rx)+((m.center.y-cy)**2)/(ry*ry);
-  return n<1.45 && m.length>Math.max(38,W*.065) && m.length<Math.min(W*.92,H*.84) && inViewport(m.center);
-}
-function footMetrics(lms,world,side){
-  const idx=side==='left'?{ankle:27,heel:29,toe:31,knee:25}:{ankle:28,heel:30,toe:32,knee:26};
-  const ankle=coverMap(lms[idx.ankle]||{}), heel=coverMap(lms[idx.heel]||{}), toe=coverMap(lms[idx.toe]||{}), knee=coverMap(lms[idx.knee]||{});
-  const raw=[lms[idx.ankle],lms[idx.heel],lms[idx.toe]].filter(Boolean);
-  const vis=raw.length?raw.reduce((s,x)=>s+(x.visibility??x.presence??1),0)/raw.length:0;
-  const length=dist(heel,toe), center={x:(heel.x+toe.x)*.5,y:(heel.y+toe.y)*.5};
-  const rz=angle(heel,toe);
-  let worldPitch=0,worldYaw=0;
-  if(world?.[idx.heel]&&world?.[idx.toe]&&world?.[idx.ankle]){
-    const wh=world[idx.heel],wt=world[idx.toe],wa=world[idx.ankle];
-    worldYaw=Math.atan2((wt.z-wh.z),(wt.x-wh.x));
-    worldPitch=Math.atan2((wa.y-wh.y),Math.max(.001,Math.abs(wt.x-wh.x)));
-  }
-  const m={side,ankle,heel,toe,knee,vis,length,center,rz,worldPitch,worldYaw,inside:false,score:vis*140+length*.08+(inViewport(center)?30:0)};
-  m.inside=insideTarget(m); return m;
-}
-function chooseFoot(res){
-  const lms=res?.landmarks?.[0]; if(!lms) return null;
-  const world=res.worldLandmarks?.[0]; const L=footMetrics(lms,world,'left'), R=footMetrics(lms,world,'right');
-  if(desiredFoot==='left')return L; if(desiredFoot==='right')return R;
-  if(L.inside&&!R.inside)return L; if(R.inside&&!L.inside)return R;
-  return L.score>=R.score?L:R;
-}
-function updateQuality(m){
-  const ok=!!(m&&m.length>35&&m.vis>.08); qualityDot.classList.toggle('ok',ok);
-  qualityText.textContent=ok?`pé ${m.side==='left'?'esq.':'dir.'} detectado`:(poseReady?'procurando pé':'IA indisponível');
-}
-function stability(m){
-  stableFrames.push({x:m.center.x,y:m.center.y,len:m.length,rz:m.rz,t:performance.now()}); if(stableFrames.length>9)stableFrames.shift();
-  if(stableFrames.length<4)return .4;
-  const xs=stableFrames.map(f=>f.x),ys=stableFrames.map(f=>f.y),ls=stableFrames.map(f=>f.len),as=stableFrames.map(f=>f.rz);
-  const range=a=>Math.max(...a)-Math.min(...a);
-  const da=Math.max(...as)-Math.min(...as);
-  const movement=Math.hypot(range(xs),range(ys))+range(ls)+Math.min(da,Math.PI*2-da)*80;
-  return clamp(1-movement/120,0,1);
-}
-function median(values){
-  const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
-  if(!a.length)return 0;
-  const mid=Math.floor(a.length/2);
-  return a.length%2?a[mid]:(a[mid-1]+a[mid])*.5;
-}
-function currentScaleAdj(){return getVal('scaleAdj',100)||1;}
-function rawScaleFromLength(lengthPx){return (lengthPx/Math.max(anchorLength,0.01));}
-function lockShoeScale(m){
-  // Trava o tamanho do tênis UMA vez, usando a mediana dos últimos frames estáveis.
-  // Depois disso, o tracking só muda posição e rotação, não fica aumentando/diminuindo.
-  const lens=stableFrames.map(f=>f.len).filter(v=>v>20);
-  lockedFootLengthPx=median(lens)||m.length;
-  lockedManualScaleAdj=currentScaleAdj();
-  lockedScale=rawScaleFromLength(lockedFootLengthPx)*lockedManualScaleAdj;
-  return lockedScale;
-}
-function updateLockedScaleFromSlider(){
-  if(lockedFootLengthPx){
-    lockedManualScaleAdj=currentScaleAdj();
-    lockedScale=rawScaleFromLength(lockedFootLengthPx)*lockedManualScaleAdj;
-  }
-}
-function targetFromMetrics(m){
-  const scaleAdj=currentScaleAdj(), xAdj=getVal('xAdj',1), yAdj=getVal('yAdj',1), rotAdj=deg(getVal('rotAdj',1)), pitchAdj=deg(getVal('pitchAdj',1)), yawAdj=deg(getVal('yawAdj',1));
-  const W=guideCanvas.width,H=guideCanvas.height;
-  const baseScale=lockedScale ?? (rawScaleFromLength(m.length)*scaleAdj);
-  return {x:m.center.x-W/2+xAdj,y:H/2-m.center.y-yAdj,z:0,scale:baseScale,rz:-m.rz+rotAdj,rx:pitchAdj+clamp(m.worldPitch*.10,-.55,.55),ry:yawAdj+clamp(m.worldYaw*.65,-.8,.8)};
-}
-function applyTransform(t,force=false){
-  const alpha=force?1:clamp(getVal('smoothAdj',100)||.26,.08,.60);
-  currentTransform.x=lerp(currentTransform.x,t.x,alpha); currentTransform.y=lerp(currentTransform.y,t.y,alpha); currentTransform.scale=lerp(currentTransform.scale,t.scale,alpha);
-  currentTransform.rz=lerpAngle(currentTransform.rz,t.rz,alpha); currentTransform.rx=lerpAngle(currentTransform.rx,t.rx,alpha); currentTransform.ry=lerpAngle(currentTransform.ry,t.ry,alpha);
-  shoeRoot.position.set(currentTransform.x,currentTransform.y,0); shoeRoot.rotation.set(currentTransform.rx,currentTransform.ry,currentTransform.rz); shoeRoot.scale.setScalar(currentTransform.scale);
-  const op=getVal('opacityAdj',100)||.93; shoeRoot.traverse(o=>{if(o.isMesh&&o.material){o.material.opacity=op;o.material.transparent=op<.99;}});
-}
-function drawGuide(m){
-  const W=guideCanvas.width,H=guideCanvas.height; gctx.clearRect(0,0,W,H);
-  if(!m)return;
-  gctx.save(); gctx.lineWidth=4; gctx.strokeStyle=m.inside?'rgba(24,199,125,.95)':'rgba(246,200,79,.95)'; gctx.fillStyle='rgba(255,255,255,.95)';
-  gctx.beginPath(); gctx.moveTo(m.heel.x,m.heel.y); gctx.lineTo(m.toe.x,m.toe.y); gctx.stroke();
-  [[m.heel,'calcanhar'],[m.toe,'ponta'],[m.ankle,'tornozelo']].forEach(([p,label])=>{gctx.beginPath();gctx.arc(p.x,p.y,7,0,Math.PI*2);gctx.fill();gctx.font='700 11px Montserrat';gctx.fillText(label,p.x+10,p.y-8);});
-  gctx.restore();
-}
-function recalibrate(){lockProgressMs=0;stableFrames=[];lockedScale=null;lockedFootLengthPx=null;lockedManualScaleAdj=currentScaleAdj();shoeRoot.visible=false;targetGuide.classList.remove('locked');trackingStarted=false;setState('SEARCHING_FOOT','Coloque pé + tornozelo na mira');status('Mantenha parado até travar o tamanho real');lockProgress.style.width='0%';hud.classList.remove('collapsed');}
-function forceLock(){if(lastMetrics){lockShoeScale(lastMetrics);const t=targetFromMetrics(lastMetrics);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Travado manualmente • tamanho fixo');status('Tênis calçado • tamanho travado no pé');lockProgress.style.width='100%';hud.classList.add('collapsed');}else{shoeRoot.visible=true;setState('LIVE_TRACKING','Modo manual • ajuste pelos controles');hud.classList.remove('collapsed');}}
-function loop(now){
-  resize(); const dt=Math.min(100,now-lastFrameMs); lastFrameMs=now; let m=null;
-  if(poseReady&&video.readyState>=2&&video.currentTime!==lastVideoTime){lastVideoTime=video.currentTime;try{m=chooseFoot(poseLandmarker.detectForVideo(video,now));}catch(e){poseError=e?.message||String(e);}}
-  if(m){lastMetrics=m; footSelected=m.side;} updateQuality(m); drawGuide(m);
-  if(!frozen&&m&&state!=='ERROR'){
-    const stab=stability(m);
-    if(state==='SEARCHING_FOOT'||state==='FOOT_LOCKING'){
-      if(m.length>35&&m.vis>.08&&m.inside){lockProgressMs+=dt*(.65+stab*.85);setState('FOOT_LOCKING',`Pé encontrado • segurando para travar`);} 
-      else if(m.length>35&&m.vis>.08){lockProgressMs+=dt*.25;setState('FOOT_LOCKING',`Aproxime da mira • pé ${m.side==='left'?'esquerdo':'direito'}`);} 
-      else {lockProgressMs=Math.max(0,lockProgressMs-dt*.7);setState('SEARCHING_FOOT','Mostre pé + tornozelo dentro da mira');}
-      lockProgressMs=clamp(lockProgressMs,0,LOCK_MS); lockProgress.style.width=`${Math.round(lockProgressMs/LOCK_MS*100)}%`;
-      status(m.inside?`Leitura boa • estabilidade ${Math.round(stab*100)}%`:'Centralize o pé e deixe tornozelo visível');
-      if(lockProgressMs>=LOCK_MS){lockShoeScale(m);const t=targetFromMetrics(m);applyTransform(t,true);shoeRoot.visible=true;trackingStarted=true;targetGuide.classList.add('locked');setState('LIVE_TRACKING','Pé travado • tamanho fixo');status('Tênis calçado no tamanho do pé • vire devagar');hud.classList.add('collapsed');}
-    }else if(state==='LIVE_TRACKING'){
-      applyTransform(targetFromMetrics(m),false); lockProgress.style.width='100%'; status(`Seguindo pé ${m.side==='left'?'esquerdo':'direito'} • tamanho fixo travado`);
-    }
-  }else if(!m&&state!=='IDLE'){
-    if(state==='LIVE_TRACKING')status('Pé saiu da câmera • mantendo última posição'); else status(poseReady?'Procurando pé e tornozelo...':'IA indisponível • use Travar agora/manual');
-  }
-  renderer.render(scene,camera);
-  debug({state,poseReady,poseError,footSelected,metrics:lastMetrics&&{side:lastMetrics.side,inside:lastMetrics.inside,len:Math.round(lastMetrics.length),vis:+lastMetrics.vis.toFixed(2),angle:+lastMetrics.rz.toFixed(2)},transform:{x:Math.round(currentTransform.x),y:Math.round(currentTransform.y),scale:+currentTransform.scale.toFixed(2),lockedScale:lockedScale&&+lockedScale.toFixed(2),lockedFootLengthPx:lockedFootLengthPx&&Math.round(lockedFootLengthPx),rz:+currentTransform.rz.toFixed(2)}});
-  requestAnimationFrame(loop);
-}
-async function takePhoto(){const W=guideCanvas.width,H=guideCanvas.height,c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');const vw=video.videoWidth||W,vh=video.videoHeight||H,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2;ctx.drawImage(video,ox,oy,dw,dh);ctx.drawImage(canvas,0,0,W,H);ctx.drawImage(guideCanvas,0,0,W,H);const a=document.createElement('a');a.download='corre4-provador-pe.png';a.href=c.toDataURL('image/png');a.click();}
-
-$('#openCameraBtn').addEventListener('click',openCamera); $('#recalibrateBtn').addEventListener('click',recalibrate); $('#lockBtn').addEventListener('click',forceLock); $('#photoBtn').addEventListener('click',takePhoto);
-$('#freezeBtn').addEventListener('click',()=>{frozen=!frozen;$('#freezeBtn').textContent=frozen?'Continuar':'Congelar';}); $('#debugBtn').addEventListener('click',()=>debugBox.classList.toggle('show'));
-$('#collapseBtn').addEventListener('click',()=>hud.classList.toggle('collapsed')); $('#drawerToggle').addEventListener('click',()=>hud.classList.toggle('collapsed'));
-$('#switchCameraBtn').addEventListener('click',async()=>{cameraFacing=cameraFacing==='environment'?'user':'environment';mirror=cameraFacing==='user';$('#mirrorBtn').classList.toggle('active',mirror);video.classList.toggle('mirror',mirror);recalibrate();await openCamera();});
-$('#mirrorBtn').addEventListener('click',()=>{mirror=!mirror;video.classList.toggle('mirror',mirror);$('#mirrorBtn').classList.toggle('active',mirror);});
-$('#guideBtn').addEventListener('click',()=>{showGuide=!showGuide;targetGuide.style.display=showGuide?'block':'none';$('#lockRing').style.display=showGuide?'block':'none';$('#guideBtn').classList.toggle('active',showGuide);});
-$$('.chip[data-foot]').forEach(b=>b.addEventListener('click',()=>{$$('.chip[data-foot]').forEach(x=>x.classList.remove('active'));b.classList.add('active');desiredFoot=b.dataset.foot;recalibrate();}));
-['scaleAdj','yAdj','xAdj','rotAdj','pitchAdj','yawAdj','opacityAdj','smoothAdj'].forEach(id=>$('#'+id)?.addEventListener('input',()=>{if(id==='scaleAdj')updateLockedScaleFromSlider(); if(lastMetrics){applyTransform(targetFromMetrics(lastMetrics),false);}}));
-setState('IDLE','Toque em Abrir câmera'); status('Toque em Abrir câmera agora');
+bind();initThree();resize();openCamera();loop();
 </script>
 </body>
 </html>
