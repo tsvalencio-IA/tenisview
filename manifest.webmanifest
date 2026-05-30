@@ -1,0 +1,9 @@
+{
+  "name":"Corre 4 AR Pro",
+  "short_name":"Corre4 AR",
+  "start_url":"index.html",
+  "display":"standalone",
+  "background_color":"#071426",
+  "theme_color":"#071426",
+  "icons":[]
+}

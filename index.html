@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Olympikus Corre 4 • 3D, Comparador e Provador no Pé</title>
+<meta name="theme-color" content="#071426" />
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand"><span class="cube">◈</span><span>Corre 4 AR Pro</span></div>
+    <div class="nav-actions">
+      <a class="btn small" href="comparador.html">Comparador</a>
+      <a class="btn small green" href="provador-pe.html">IA no pé</a>
+      <a class="btn small gold" href="#ficha">Ficha</a>
+    </div>
+  </div>
+</nav>
+<main class="app">
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="kicker">Tênis One • Visual commerce • AR</div>
+        <h1 id="title">Olympikus Corre 4</h1>
+        <p id="subtitle">GLB local temporário, visualização 360°, comparador técnico e provador automático no pé com câmera + IA.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+          <a class="btn gold" href="provador-pe.html">Abrir IA no pé</a>
+          <a class="btn green" href="comparador.html">Comparar modelos</a>
+          <button class="btn ghost" id="speakBtn">Ouvir resumo</button>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <div class="metric-grid" id="metricGrid"></div>
+        <div class="notice">Quando o GLB profissional ficar pronto, troque apenas <strong>models/corre4.glb</strong>. O sistema inteiro já está preparado para usar o arquivo melhor.</div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section card pad">
+    <div class="card-head">
+      <div>
+        <h2>Visualização 360°</h2>
+        <p class="muted">Gire, aproxime, veja os hotspots e abra em AR. Esta área usa o arquivo local <strong>models/corre4.glb</strong>.</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn small ghost" id="resetView">Reset</button>
+        <button class="btn small gold" id="arBtn">AR</button>
+      </div>
+    </div>
+    <div class="viewer-wrap">
+      <model-viewer id="shoeViewer" src="models/corre4.glb" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.05" environment-image="neutral" ar ar-modes="webxr scene-viewer quick-look" camera-orbit="35deg 66deg 4.2m" field-of-view="34deg" alt="Modelo 3D do Olympikus Corre 4">
+        <button class="hotspot blue" slot="hotspot-cabedal" data-position="0.04m 0.58m 0.16m" data-normal="0m 1m 0m" data-part="cabedal"><span class="annotation">Cabedal</span></button>
+        <button class="hotspot green" slot="hotspot-entressola" data-position="0.04m 0.16m 0.2m" data-normal="0m 1m 0m" data-part="entressola"><span class="annotation">Entressola</span></button>
+        <button class="hotspot dark" slot="hotspot-solado" data-position="0.04m -0.06m 0.2m" data-normal="0m -1m 0m" data-part="solado"><span class="annotation">Solado</span></button>
+        <button class="hotspot" slot="hotspot-contraforte" data-position="-0.52m 0.36m 0.12m" data-normal="-1m 0m 0m" data-part="contraforte"><span class="annotation">Contraforte</span></button>
+        <button class="hotspot purple" slot="hotspot-placa" data-position="0.25m 0.08m 0.12m" data-normal="0m 1m 0m" data-part="placa"><span class="annotation">Placa/Apoio</span></button>
+      </model-viewer>
+      <div class="ar-mini"><button class="btn small ghost" id="arBtn2">▣ AR</button></div>
+      <div class="floating-pill">↻ Visualização 360°</div>
+      <div class="status-row"><span>Arraste • zoom • AR</span><span id="modelStatus">GLB local carregado</span></div>
+    </div>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="info-box" style="margin-top:12px" id="partInfo"></div>
+  </section>
+
+  <section class="section grid-2" id="ficha">
+    <article class="card pad">
+      <div class="card-head"><h2>Ficha técnica verdadeira</h2></div>
+      <div class="table-wrap"><table><thead><tr><th>Item</th><th>Informação</th></tr></thead><tbody id="fichaBody"></tbody></table></div>
+    </article>
+    <article class="card pad">
+      <div class="card-head"><h2>Indicação de venda</h2></div>
+      <div class="info-box"><p id="resumoProduto"></p></div>
+      <div class="accordion" style="margin-top:12px" id="accordionInfo"></div>
+    </article>
+  </section>
+
+  <section class="section grid-3">
+    <article class="card pad">
+      <h2>Fluxo AR no pé</h2>
+      <p class="muted">O provador abre a câmera, mostra uma mira, espera estabilidade, trava o pé e faz o tênis seguir tornozelo, calcanhar e ponta do pé.</p>
+      <a class="btn green" href="provador-pe.html" style="margin-top:14px">Testar agora</a>
+    </article>
+    <article class="card pad">
+      <h2>Comparador comercial</h2>
+      <p class="muted">Carrega GLB local ou URL, explica cabedal, entressola, solado, contraforte e proposta de uso.</p>
+      <a class="btn blue" href="comparador.html" style="margin-top:14px">Abrir comparador</a>
+    </article>
+    <article class="card pad">
+      <h2>Próxima etapa</h2>
+      <p class="muted">Módulo de régua/QR impresso para medir pé, largura, comprimento e recomendar numeração por tabela do fabricante.</p>
+      <button class="btn ghost" style="margin-top:14px" onclick="alert('Próximo módulo: calibrar câmera com marcador físico de tamanho conhecido para medir o pé em centímetros.')">Ver ideia</button>
+    </article>
+  </section>
+
+  <section class="section card pad">
+    <div class="card-head"><h2>Fontes e observações</h2></div>
+    <div class="grid-2">
+      <div class="source-list" id="sources"></div>
+      <div class="notice warning">O GLB atual é funcional, mas temporário. O salto de qualidade virá quando você substituir por um GLB gerado em Meshy, Tripo, KIRI, Polycam ou por modelador 3D.</div>
+    </div>
+  </section>
+  <div class="footer">Powered by thIAguinho Soluções Digitais</div>
+</main>
+<script src="assets/js/product-data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
