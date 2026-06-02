@@ -63,3 +63,19 @@ A ideia comercial é viável como próximo módulo:
 Isso exige uma tabela oficial de medidas por marca/modelo e calibração por marcador físico.
 
 Powered by thIAguinho Soluções Digitais
+
+
+NOVA PÁGINA PRINCIPAL — AR LIVRE + CALÇAR
+-----------------------------------------
+Arquivo novo:
+- ar-livre-calcador.html
+
+Fluxo:
+1. Abrir câmera.
+2. Ajustar o tênis manualmente em cima do pé.
+3. Arrastar, pinçar, girar e usar botões finos.
+4. Clicar em "Travar posição".
+5. Clicar em "Calçar no pé".
+
+Esta versão não fica presa em "procurando pé".
+Ela prioriza o ajuste manual perfeito feito pelo usuário.

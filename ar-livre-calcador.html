@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>Corre 4 • AR Livre + Calçar no Pé</title>
+<meta name="theme-color" content="#020814" />
+<style>
+:root{--bg:#020814;--glass:rgba(5,12,22,.78);--line:rgba(255,255,255,.16);--text:#f6f8ff;--muted:#b9c6d8;--gold:#f7ca43;--green:#16c784;--blue:#3d9cff;--red:#ff496b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;touch-action:none;overscroll-behavior:none}
+#app{position:fixed;inset:0;background:#000;overflow:hidden}
+#video,#arCanvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#video{z-index:1;background:#000}
+#video.mirror{transform:scaleX(-1)}
+#arCanvas{z-index:3;touch-action:none}
+.shade{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 50% 48%,transparent 0 58%,rgba(0,0,0,.22) 100%)}
+.top{position:absolute;z-index:20;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));display:flex;gap:8px;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.card{pointer-events:auto;background:var(--glass);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(14px);box-shadow:0 12px 34px rgba(0,0,0,.35)}
+.title{padding:10px 12px;max-width:58vw}
+.title h1{font-size:15px;line-height:1.05;margin:0 0 4px;font-weight:950}
+.title p{font-size:11px;line-height:1.25;margin:0;color:var(--muted);font-weight:700}
+.topBtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
+.btn{border:0;border-radius:14px;min-height:38px;padding:0 12px;background:#17283f;color:#fff;font-weight:950;font-size:12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.gold{background:linear-gradient(#ffe66e,#d3a51a);color:#181103}
+.btn.green{background:linear-gradient(#1cdb8f,#0b9559)}
+.btn.blue{background:linear-gradient(#4cabff,#1769c6)}
+.btn.red{background:#3a1420;color:#ffd7df}
+.btn.dark{background:rgba(7,16,29,.82)}
+.btn.active{outline:2px solid var(--gold)}
+.bottom{position:absolute;z-index:30;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));display:grid;gap:7px;pointer-events:none}
+.status{pointer-events:none;justify-self:center;max-width:94vw;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:8px 12px;font-size:11px;font-weight:900;text-align:center;text-shadow:0 2px 10px #000}
+.mainbar{pointer-events:auto;display:grid;grid-template-columns:1fr 1fr 1fr 48px;gap:7px;padding:7px;background:rgba(2,8,20,.84);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(16px)}
+.strip{pointer-events:auto;display:flex;gap:6px;overflow-x:auto;background:rgba(2,8,20,.70);border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:6px;backdrop-filter:blur(12px);scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip .btn{white-space:nowrap;min-height:34px;padding:0 10px}
+.loader{position:absolute;z-index:60;inset:0;background:radial-gradient(circle,#12305c,#020814 66%);display:grid;place-items:center;text-align:center;padding:18px}
+.loader.hide{display:none}
+.loaderCard{max-width:470px;border:1px solid rgba(255,255,255,.16);border-radius:24px;background:rgba(255,255,255,.08);padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.45)}
+.loaderCard h2{margin:0 0 8px;font-size:28px}
+.loaderCard p{margin:0 0 14px;color:#d7e4f6;font-size:14px;line-height:1.45;font-weight:650}
+.lockBadge{position:absolute;z-index:25;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:none;background:rgba(8,30,20,.82);border:1px solid rgba(22,199,132,.7);color:#bfffe2;border-radius:999px;padding:10px 16px;font-weight:950;box-shadow:0 0 45px rgba(22,199,132,.22)}
+.lockBadge.show{display:block}
+.guide{position:absolute;z-index:4;left:50%;top:48%;width:72vw;height:29vh;max-width:460px;max-height:320px;transform:translate(-50%,-50%);border:2px dashed rgba(247,202,67,.72);border-radius:55% 55% 48% 48%;pointer-events:none;opacity:.55}
+.guide.locked{border-color:rgba(22,199,132,.95);opacity:.8}
+.footerMark{position:absolute;z-index:10;right:12px;top:58px;font-size:10px;color:rgba(255,255,255,.55);font-weight:800;pointer-events:none}
+@media(max-width:520px){.title{max-width:50vw;padding:9px}.title h1{font-size:12px}.title p{font-size:10px}.btn{font-size:10px;min-height:34px;padding:0 9px}.mainbar{grid-template-columns:1fr 1fr 1fr 42px}.status{font-size:10px;padding:7px 9px}.loaderCard h2{font-size:23px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+<div id="app">
+  <video id="video" autoplay playsinline muted></video>
+  <div class="shade"></div>
+  <canvas id="arCanvas"></canvas>
+  <div class="guide" id="guide"></div>
+  <div class="footerMark">Powered by thIAguinho Soluções Digitais</div>
+  <div class="top">
+    <div class="card title"><h1>AR Livre + Calçar</h1><p id="stateText">Abra a câmera, ajuste o tênis com a mão, trave e calce.</p></div>
+    <div class="topBtns"><a class="btn dark" href="index.html">Voltar</a><button class="btn dark" id="mirrorBtn">Espelhar</button><button class="btn gold" id="resetBtn">Reset</button></div>
+  </div>
+  <div class="lockBadge" id="lockBadge">POSIÇÃO TRAVADA</div>
+  <div class="bottom">
+    <div class="status" id="status">Fluxo correto: ajuste manual primeiro. A IA só ajuda depois, se detectar o pé.</div>
+    <div class="mainbar"><button class="btn green" id="openBtn">Abrir câmera</button><button class="btn gold" id="lockBtn">Travar posição</button><button class="btn blue" id="wearBtn">Calçar no pé</button><button class="btn" id="shotBtn">📸</button></div>
+    <div class="strip">
+      <button class="btn" id="sizeMinus">- tamanho</button><button class="btn" id="sizePlus">+ tamanho</button>
+      <button class="btn" id="rotLeft">↶ girar</button><button class="btn" id="rotRight">↷ girar</button>
+      <button class="btn" id="upBtn">↑ subir</button><button class="btn" id="downBtn">↓ descer</button>
+      <button class="btn" id="leftBtn">← esquerda</button><button class="btn" id="rightBtn">→ direita</button>
+      <button class="btn" id="cameraBtn">Trocar câmera</button><button class="btn red" id="manualBtn">Manual</button>
+    </div>
+  </div>
+  <div class="loader" id="loader"><div class="loaderCard"><h2>AR Livre Inteligente</h2><p>O tênis aparece na câmera e você ajusta com a mão. Depois toque em <b>Travar posição</b> e <b>Calçar no pé</b>.</p><button class="btn gold" id="loaderOpenBtn">Abrir câmera agora</button></div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const video=$('video'), canvas=$('arCanvas'), loader=$('loader'), statusEl=$('status'), stateText=$('stateText'), guide=$('guide'), lockBadge=$('lockBadge');
+let scene,camera,renderer,shoeRoot,modelLen=1,shoeReady=false,stream=null,facingMode='environment',mirror=false;
+let pointers=new Map(),dragStart=null,pinchStart=null,locked=false,wearing=false,lockedTransform=null;
+let tr={x:0,y:0,scale:1,rz:0,rx:-0.15}, lastApplied={...tr};
+function msg(t){statusEl.textContent=t} function state(t){stateText.textContent=t}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))} function lerp(a,b,t){return a+(b-a)*t}
+function dist(a,b){const dx=a.x-b.x,dy=a.y-b.y;return Math.sqrt(dx*dx+dy*dy)}
+function resize(){const w=innerWidth,h=innerHeight;if(renderer){renderer.setSize(w,h,false);camera.left=-w/2;camera.right=w/2;camera.top=h/2;camera.bottom=-h/2;camera.updateProjectionMatrix()}}
+addEventListener('resize',resize);
+function initThree(){renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.outputEncoding=THREE.sRGBEncoding;scene=new THREE.Scene();camera=new THREE.OrthographicCamera(-innerWidth/2,innerWidth/2,innerHeight/2,-innerHeight/2,-1000,1000);camera.position.z=100;scene.add(new THREE.HemisphereLight(0xffffff,0x334466,1.8));let l=new THREE.DirectionalLight(0xffffff,1.5);l.position.set(0,0,300);scene.add(l);shoeRoot=new THREE.Group();scene.add(shoeRoot);loadShoe();resize();renderLoop()}
+function makeText(t){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.font='900 82px Arial';x.fillStyle='white';x.fillText(t,20,88);const tex=new THREE.CanvasTexture(c);return new THREE.Mesh(new THREE.PlaneGeometry(150,38),new THREE.MeshBasicMaterial({map:tex,transparent:true}))}
+function fallbackShoe(){const g=new THREE.Group(),red=new THREE.MeshStandardMaterial({color:0xd30a1b,roughness:.75,transparent:true,opacity:.96}),dark=new THREE.MeshStandardMaterial({color:0x58040c,roughness:.86,transparent:true,opacity:.96});let sole=new THREE.Mesh(new THREE.BoxGeometry(310,45,86,14,2,3),dark);sole.position.y=-28;g.add(sole);let upper=new THREE.Mesh(new THREE.BoxGeometry(265,76,68,16,4,4),red);upper.position.set(-5,8,0);g.add(upper);let toe=new THREE.Mesh(new THREE.SphereGeometry(48,32,16),red);toe.scale.set(1.28,.72,.82);toe.position.set(138,5,0);g.add(toe);let heel=new THREE.Mesh(new THREE.SphereGeometry(50,32,16),red);heel.scale.set(.82,1,.86);heel.position.set(-140,8,0);g.add(heel);for(let i=0;i<6;i++){let lace=new THREE.Mesh(new THREE.BoxGeometry(72,7,5),dark);lace.position.set(-58+i*23,50,29);lace.rotation.z=(i%2?.22:-.22);g.add(lace)}let logo=makeText('CORRE');logo.position.set(-38,24,46);g.add(logo);return g}
+function loadShoe(){new THREE.GLTFLoader().load('models/corre4.glb',gltf=>{shoeRoot.clear();shoeRoot.add(gltf.scene);prepModel();shoeReady=true;resetTransform(false)},undefined,()=>{shoeRoot.clear();shoeRoot.add(fallbackShoe());prepModel();shoeReady=true;resetTransform(false)})}
+function prepModel(){const box=new THREE.Box3().setFromObject(shoeRoot),size=new THREE.Vector3(),center=new THREE.Vector3();box.getSize(size);box.getCenter(center);if(shoeRoot.children[0])shoeRoot.children[0].position.sub(center);modelLen=Math.max(size.x,size.y,size.z,1);shoeRoot.traverse(o=>{if(o.isMesh){o.frustumCulled=false;if(o.material){o.material.transparent=true;o.material.opacity=.96}}})}
+function applyTransform(t,s=1){lastApplied.x=lerp(lastApplied.x,t.x,s);lastApplied.y=lerp(lastApplied.y,t.y,s);lastApplied.scale=lerp(lastApplied.scale,t.scale,s);let d=Math.atan2(Math.sin(t.rz-lastApplied.rz),Math.cos(t.rz-lastApplied.rz));lastApplied.rz+=d*s;lastApplied.rx=lerp(lastApplied.rx,t.rx??-0.15,s);shoeRoot.position.set(lastApplied.x,lastApplied.y,0);shoeRoot.scale.setScalar(lastApplied.scale);shoeRoot.rotation.set(lastApplied.rx,0,lastApplied.rz)}
+function renderLoop(){requestAnimationFrame(renderLoop);if(renderer)renderer.render(scene,camera)}
+function resetTransform(hard=true){tr={x:0,y:0,scale:Math.min(innerWidth,innerHeight)/modelLen*.55,rz:0,rx:-0.15};lastApplied={...tr};applyTransform(tr,1);locked=false;wearing=false;lockedTransform=null;guide.classList.remove('locked');lockBadge.classList.remove('show');if(hard)msg('Ajuste o tênis com a mão. Depois toque em Travar posição.')}
+async function openCamera(){try{loader.classList.add('hide');msg('Abrindo câmera...');if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:facingMode},width:{ideal:1280},height:{ideal:720}}});video.srcObject=stream;await video.play();state('Câmera aberta. Ajuste o tênis livremente.');msg('Arraste com 1 dedo. Belisque com 2 dedos para tamanho e rotação. Depois trave.')}catch(e){loader.classList.remove('hide');msg('Erro ao abrir câmera. Use HTTPS no GitHub Pages e permita a câmera.');state('Câmera bloqueada ou indisponível.')}}
+function lockPosition(){locked=true;wearing=false;lockedTransform={...tr};guide.classList.add('locked');lockBadge.classList.add('show');setTimeout(()=>lockBadge.classList.remove('show'),1000);state('Posição travada. Agora toque em Calçar no pé.');msg('Posição travada. O sistema não dependeu da IA para isso.')}
+function wear(){if(!locked)lockPosition();wearing=true;state('Calçado em modo manual travado.');msg('Tênis calçado no ponto escolhido. Se mover o pé, toque em Manual e ajuste novamente.')}
+function pointerDistance(vals){return dist(vals[0],vals[1])} function pointerAngle(vals){return Math.atan2(vals[1].y-vals[0].y,vals[1].x-vals[0].x)}
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});locked=false;wearing=false;guide.classList.remove('locked');if(pointers.size===1){dragStart={id:e.pointerId,x:e.clientX,y:e.clientY,tx:tr.x,ty:tr.y}}else if(pointers.size===2){const vals=Array.from(pointers.values());pinchStart={dist:pointerDistance(vals),ang:pointerAngle(vals),scale:tr.scale,rz:tr.rz}}});
+canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;e.preventDefault();pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1&&dragStart){const p=pointers.get(dragStart.id);if(!p)return;tr.x=dragStart.tx+(p.x-dragStart.x);tr.y=dragStart.ty-(p.y-dragStart.y);applyTransform(tr,1);msg('Movendo o tênis. Ajuste livre, depois trave.')}else if(pointers.size===2&&pinchStart){const vals=Array.from(pointers.values()),d=pointerDistance(vals),a=pointerAngle(vals);tr.scale=clamp(pinchStart.scale*(d/pinchStart.dist),.03,8);tr.rz=pinchStart.rz+(a-pinchStart.ang);applyTransform(tr,1);msg('Ajustando tamanho e rotação. Depois trave.')}});
+function endPointer(e){pointers.delete(e.pointerId);if(pointers.size===0){dragStart=null;pinchStart=null}if(pointers.size===1){const entry=Array.from(pointers.entries())[0];dragStart={id:entry[0],x:entry[1].x,y:entry[1].y,tx:tr.x,ty:tr.y};pinchStart=null}}
+canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
+function nudge(dx,dy){locked=false;wearing=false;guide.classList.remove('locked');tr.x+=dx;tr.y+=dy;applyTransform(tr,1)}
+function rotate(dr){locked=false;wearing=false;guide.classList.remove('locked');tr.rz+=dr;applyTransform(tr,1)}
+function scaleBy(s){locked=false;wearing=false;guide.classList.remove('locked');tr.scale=clamp(tr.scale*s,.03,8);applyTransform(tr,1)}
+$('openBtn').onclick=openCamera;$('loaderOpenBtn').onclick=openCamera;$('lockBtn').onclick=lockPosition;$('wearBtn').onclick=wear;$('resetBtn').onclick=()=>resetTransform(true);
+$('mirrorBtn').onclick=()=>{mirror=!mirror;video.classList.toggle('mirror',mirror);$('mirrorBtn').classList.toggle('active',mirror)};
+$('cameraBtn').onclick=async()=>{facingMode=facingMode==='environment'?'user':'environment';mirror=facingMode==='user';video.classList.toggle('mirror',mirror);await openCamera()};
+$('sizeMinus').onclick=()=>scaleBy(.94);$('sizePlus').onclick=()=>scaleBy(1.06);$('rotLeft').onclick=()=>rotate(-Math.PI/36);$('rotRight').onclick=()=>rotate(Math.PI/36);
+$('upBtn').onclick=()=>nudge(0,14);$('downBtn').onclick=()=>nudge(0,-14);$('leftBtn').onclick=()=>nudge(-14,0);$('rightBtn').onclick=()=>nudge(14,0);
+$('manualBtn').onclick=()=>{wearing=false;locked=false;guide.classList.remove('locked');msg('Modo manual ativo. Ajuste com a mão e trave novamente.')};
+$('shotBtn').onclick=()=>{const c=document.createElement('canvas');c.width=innerWidth;c.height=innerHeight;const ctx=c.getContext('2d');try{ctx.drawImage(video,0,0,innerWidth,innerHeight)}catch(e){}ctx.drawImage(canvas,0,0,innerWidth,innerHeight);const a=document.createElement('a');a.download='corre4-ar-livre-calcado.png';a.href=c.toDataURL('image/png');a.click()};
+initThree();
+</script>
+</body>
+</html>
