@@ -162,7 +162,6 @@ function loop(){
   }
   diag.textContent = JSON.stringify({mode, calibrated, poseReady, foot: f && {side: f.side, len: Math.round(f.len), vis: f.vis.toFixed(2)}, aim: targetFromAim()}, null, 2);
 }
-function calibrateAim(){mode='aim';$('modeAimBtn').classList.add('active');$('modeAiBtn').classList.remove('active');applyTarget(targetFromAim(),true);setState('Calibrado pela mira');msg('Tênis travado na mira. Ajuste Tamanho mira / Cobertura / Rotação se precisar.');showToast('Calibrado pela mira')}
 function calibrateAim(){
   mode='aim';
   $('modeAimBtn').classList.add('active');
