@@ -1,3 +1,11 @@
+// Liga os botões de edição e calçar
+$('editBtn').onclick=startEdit;
+$('wearBtn').onclick=wearShoe;
+// Eventos de ponteiro para edição manual (drag e pinch)
+$('ar').addEventListener('pointerdown', onPointerDown);
+$('ar').addEventListener('pointermove', onPointerMove);
+$('ar').addEventListener('pointerup', onPointerUp);
+$('ar').addEventListener('pointercancel', onPointerUp);
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -34,6 +42,8 @@
     <div class="mainbar">
       <button class="btn green" id="openBtn">Abrir câmera</button>
       <button class="btn gold" id="calibrateBtn">Calibrar pela mira</button>
+      <!-- Adicionamos um botão para calibrar manualmente clicando no início e no fim do pé -->
+      <button class="btn gold" id="manualBtn">Calibrar clique</button>
       <button class="btn blue" id="photoBtn">📸</button>
       <button class="btn" id="settingsBtn">⚙</button>
     </div>
@@ -46,6 +56,9 @@
       <button class="btn" id="freezeBtn">Congelar</button>
       <button class="btn" id="leftBtn">↶</button>
       <button class="btn" id="rightBtn">↷</button>
+      <!-- Botões para edição manual da posição/tamanho e para calçar o tênis -->
+      <button class="btn" id="editBtn">Mover/Redimensionar</button>
+      <button class="btn gold" id="wearBtn">Calçar</button>
     </div>
     <div class="drawer" id="drawer">
       <div class="slider"><label>Tamanho mira <span id="vAim">100%</span></label><input id="aimSize" type="range" min="65" max="145" value="100"></div>
@@ -86,13 +99,296 @@ function videoMap(lm){const W=innerWidth,H=innerHeight,vw=video.videoWidth||W,vh
 function detectFoot(){if(!poseReady||!pose||video.currentTime===lastVideoTime)return null;lastVideoTime=video.currentTime;let res;try{res=pose.detectForVideo(video,performance.now())}catch(e){return null}let l=res.landmarks&&res.landmarks[0];if(!l)return null;function one(side){let i=side==='left'?{ankle:27,heel:29,toe:31}:{ankle:28,heel:30,toe:32};let ankle=videoMap(l[i.ankle]),heel=videoMap(l[i.heel]),toe=videoMap(l[i.toe]);let len=dist(heel,toe),vis=(ankle.v+heel.v+toe.v)/3;return{side,ankle,heel,toe,len,vis,center:{x:(heel.x+toe.x)/2,y:(heel.y+toe.y)/2},ang:angle(heel,toe),score:len+vis*180}}let L=one('left'),R=one('right');let f=L.score>R.score?L:R;if(f.len<35||f.vis<.05)return null;return f}
 function targetFromAim(){const W=innerWidth,H=innerHeight;let aimW=Math.min(W*.78*(v('aimSize')/100),470);let aimH=Math.min(H*.34*(v('aimSize')/100),350);let lengthPx=Math.max(aimW,aimH*.95)*(v('cover')/100);return{x:W/2 + v('xFine'),y:H*.49 + v('yFine'),len:lengthPx,ang:rad(v('rotFine'))}}
 function targetFromFoot(f){return{x:f.center.x+v('xFine'),y:f.center.y+v('yFine'),len:f.len*(v('cover')/100),ang:f.ang+rad(v('rotFine'))}}
-function applyTarget(t,instant=false){if(!shoeReady)return;let W=innerWidth,H=innerHeight,scale=t.len/modelLen;let target={x:t.x-W/2,y:H/2-t.y,scale,rz:-t.ang,rx:rad(v('pitch')),ry:0};let smooth=(v('smooth')/100);let a=instant?1:(1-smooth);if(!lastTransform)lastTransform=target;lastTransform.x=lerp(lastTransform.x,target.x,a);lastTransform.y=lerp(lastTransform.y,target.y,a);lastTransform.scale=lerp(lastTransform.scale,target.scale,a);let d=Math.atan2(Math.sin(target.rz-lastTransform.rz),Math.cos(target.rz-lastTransform.rz));lastTransform.rz+=d*a;lastTransform.rx=lerp(lastTransform.rx,target.rx,a);shoeRoot.visible=true;shoeRoot.position.set(lastTransform.x,lastTransform.y,0);shoeRoot.scale.setScalar(lastTransform.scale);shoeRoot.rotation.set(lastTransform.rx,0,lastTransform.rz);shoeRoot.traverse(o=>{if(o.isMesh&&o.material){o.material.opacity=v('opacity')/100;o.material.transparent=true}});calibrated=true;aim.classList.add('locked')}
+function applyTarget(t,instant=false){
+  if(!shoeReady)return;
+  let W=innerWidth,H=innerHeight;
+  // Offsets aplicados somente quando estamos em modo IA com followOffset definido
+  let offX=0,offY=0,offScale=1,offAng=0;
+  if(followOffset&&mode==='ai'){
+    offX=followOffset.x;
+    offY=followOffset.y;
+    offScale=followOffset.scale;
+    offAng=followOffset.ang;
+  }
+  // Cálculo de escala base incluindo offset
+  let baseScale=(t.len/modelLen)*offScale;
+  // Rotação ajustada
+  let rz=-t.ang + offAng;
+  // Posição ajustada
+  let tx=t.x - W/2 + offX;
+  let ty=H/2 - t.y + offY;
+  let target={x:tx,y:ty,scale:baseScale,rz:rz,rx:rad(v('pitch')),ry:0};
+  let smooth=(v('smooth')/100);
+  let a=instant?1:(1-smooth);
+  if(!lastTransform)lastTransform=target;
+  lastTransform.x=lerp(lastTransform.x,target.x,a);
+  lastTransform.y=lerp(lastTransform.y,target.y,a);
+  lastTransform.scale=lerp(lastTransform.scale,target.scale,a);
+  let d=Math.atan2(Math.sin(target.rz-lastTransform.rz),Math.cos(target.rz-lastTransform.rz));
+  lastTransform.rz+=d*a;
+  lastTransform.rx=lerp(lastTransform.rx,target.rx,a);
+  shoeRoot.visible=true;
+  shoeRoot.position.set(lastTransform.x,lastTransform.y,0);
+  shoeRoot.scale.setScalar(lastTransform.scale);
+  shoeRoot.rotation.set(lastTransform.rx,0,lastTransform.rz);
+  shoeRoot.traverse(o=>{if(o.isMesh&&o.material){o.material.opacity=v('opacity')/100;o.material.transparent=true}});
+  calibrated=true;
+  aim.classList.add('locked');
+}
 function drawFoot(f){g.clearRect(0,0,guide.width,guide.height);if(!f)return;g.lineWidth=4;g.strokeStyle='rgba(24,199,125,.95)';g.fillStyle='white';g.beginPath();g.moveTo(f.heel.x,f.heel.y);g.lineTo(f.toe.x,f.toe.y);g.moveTo(f.heel.x,f.heel.y);g.lineTo(f.ankle.x,f.ankle.y);g.stroke();[['PONTA',f.toe],['CALCANHAR',f.heel],['TORNOZELO',f.ankle]].forEach(([txt,p])=>{g.beginPath();g.arc(p.x,p.y,7,0,Math.PI*2);g.fill();g.font='800 11px Arial';g.fillText(txt,p.x+9,p.y-8)})}
-function loop(){requestAnimationFrame(loop);if(!video.srcObject||frozen)return;let f=detectFoot();if(f){lastFoot=f;drawFoot(f);if(mode==='ai'&&calibrated){applyTarget(targetFromFoot(f),false);msg('IA seguindo o pé. Se escorregar, volte ao Modo mira.')}}else{drawFoot(null);if(mode==='ai')msg('IA procurando pé. Mostre pé + tornozelo; modo mira continua disponível.')}diag.textContent=JSON.stringify({mode,calibrated,poseReady,foot:f&&{side:f.side,len:Math.round(f.len),vis:f.vis.toFixed(2)},aim:targetFromAim()},null,2)}
+function loop(){
+  requestAnimationFrame(loop);
+  if(!video.srcObject||frozen) return;
+  let f = detectFoot();
+  // Durante a edição manual, não aplicamos transformações automáticas
+  if(editMode){
+    if(f) lastFoot = f;
+    drawFoot(f);
+    diag.textContent = JSON.stringify({mode, calibrated, poseReady, foot: f && {side: f.side, len: Math.round(f.len), vis: f.vis.toFixed(2)}, aim: targetFromAim()}, null, 2);
+    return;
+  }
+  if(f){
+    lastFoot = f;
+    drawFoot(f);
+    if(mode==='ai' && calibrated){
+      applyTarget(targetFromFoot(f), false);
+      msg('IA seguindo o pé. Se escorregar, volte ao Modo mira.');
+    }
+  } else {
+    drawFoot(null);
+    if(mode==='ai'){
+      msg('IA procurando pé. Mostre pé + tornozelo; modo mira continua disponível.');
+    }
+  }
+  diag.textContent = JSON.stringify({mode, calibrated, poseReady, foot: f && {side: f.side, len: Math.round(f.len), vis: f.vis.toFixed(2)}, aim: targetFromAim()}, null, 2);
+}
 function calibrateAim(){mode='aim';$('modeAimBtn').classList.add('active');$('modeAiBtn').classList.remove('active');applyTarget(targetFromAim(),true);setState('Calibrado pela mira');msg('Tênis travado na mira. Ajuste Tamanho mira / Cobertura / Rotação se precisar.');showToast('Calibrado pela mira')}
-function reset(){calibrated=false;lastTransform=null;shoeRoot.visible=false;aim.classList.remove('locked');setState('Resetado');msg('Coloque o pé na mira e calibre novamente.')}
+function calibrateAim(){
+  mode='aim';
+  $('modeAimBtn').classList.add('active');
+  $('modeAiBtn').classList.remove('active');
+  // Limpa offset de acompanhamento
+  followOffset = null;
+  applyTarget(targetFromAim(), true);
+  setState('Calibrado pela mira');
+  msg('Tênis travado na mira. Ajuste Tamanho mira / Cobertura / Rotação se precisar.');
+  showToast('Calibrado pela mira');
+}
+function reset(){
+  calibrated=false;
+  lastTransform=null;
+  shoeRoot.visible=false;
+  aim.classList.remove('locked');
+  // Limpa modos e offsets
+  manualMode=false;
+  editMode=false;
+  followOffset=null;
+  aim.classList.remove('off');
+  cross.classList.remove('off');
+  setState('Resetado');
+  msg('Coloque o pé na mira e calibre novamente.');
+}
+
+// ----- Suporte a arrastar e redimensionar no modo de edição -----
+// Funções auxiliares para pointer events (drag/pinch)
+function onPointerDown(evt){
+  if(!editMode||!shoeReady)return;
+  // Apenas interage com o canvas de AR
+  evt.preventDefault();
+  // Captura ponto atual
+  activePointers.set(evt.pointerId,{x:evt.clientX,y:evt.clientY});
+  if(activePointers.size===1){
+    // Início de drag
+    dragStart={id:evt.pointerId,x:evt.clientX,y:evt.clientY,
+      sx:lastTransform?lastTransform.x:0,
+      sy:lastTransform?lastTransform.y:0};
+  }else if(activePointers.size===2){
+    // Início de pinch
+    const vals=Array.from(activePointers.values());
+    const dx=vals[1].x-vals[0].x;
+    const dy=vals[1].y-vals[0].y;
+    scaleBase={dist:Math.sqrt(dx*dx+dy*dy),s:lastTransform?lastTransform.scale:1};
+  }
+}
+function onPointerMove(evt){
+  if(!editMode||!shoeReady)return;
+  if(!activePointers.has(evt.pointerId))return;
+  evt.preventDefault();
+  activePointers.set(evt.pointerId,{x:evt.clientX,y:evt.clientY});
+  if(activePointers.size===1&&dragStart){
+    // Atualiza posição do tênis com base no deslocamento do ponteiro
+    const p=activePointers.get(dragStart.id);
+    const dx=p.x-dragStart.x;
+    const dy=p.y-dragStart.y;
+    if(!lastTransform)lastTransform={x:0,y:0,scale:1,rz:0,rx:0};
+    lastTransform.x=dragStart.sx+dx;
+    lastTransform.y=dragStart.sy-dy;
+    shoeRoot.visible=true;
+    shoeRoot.position.set(lastTransform.x,lastTransform.y,0);
+  }else if(activePointers.size===2&&scaleBase){
+    // Atualiza escala do tênis com base na distância entre dois dedos
+    const vals=Array.from(activePointers.values());
+    const dx=vals[1].x-vals[0].x;
+    const dy=vals[1].y-vals[0].y;
+    const newDist=Math.sqrt(dx*dx+dy*dy);
+    let newScale=scaleBase.s*(newDist/scaleBase.dist);
+    if(newScale<0.05)newScale=0.05;
+    if(!lastTransform)lastTransform={x:0,y:0,scale:newScale,rz:0,rx:0};
+    lastTransform.scale=newScale;
+    shoeRoot.visible=true;
+    shoeRoot.scale.setScalar(newScale);
+  }
+}
+function onPointerUp(evt){
+  if(!editMode||!shoeReady)return;
+  evt.preventDefault();
+  activePointers.delete(evt.pointerId);
+  if(activePointers.size===1){
+    // Se saímos de pinch para drag, reinicializamos dragStart para o ponteiro restante
+    const remaining=Array.from(activePointers.entries())[0];
+    dragStart={id:remaining[0],x:remaining[1].x,y:remaining[1].y,
+      sx:lastTransform?lastTransform.x:0,
+      sy:lastTransform?lastTransform.y:0};
+    scaleBase=null;
+  }else if(activePointers.size===0){
+    dragStart=null;
+    scaleBase=null;
+  }
+}
+
+// =====================
+// Calibração manual
+//
+// Algumas pessoas preferem indicar exatamente onde começa e termina o pé
+// tocando na tela. O sistema usa dois cliques para calcular o centro,
+// a orientação e o comprimento do pé, e então ajusta o tênis de acordo.
+let manualMode = false;        // true quando aguardamos cliques do usuário
+let manualClicks = [];        // guarda as coordenadas dos cliques
+
+// =====================
+// Modo de edição manual (mover/redimensionar)
+//
+// Permite arrastar e redimensionar o tênis antes de calçar definitivamente.
+// Quando o usuário tocar em "Calçar", o sistema calcula o offset entre a
+// posição manual e a posição de referência do pé e passa a acompanhar o
+// movimento do pé mantendo esse offset.
+let editMode = false;       // ativa quando estamos editando manualmente
+let activePointers = new Map(); // map<id,{x,y}> para multitouch
+let dragStart = null;       // estado inicial do drag
+let scaleBase = null;       // estado inicial do pinch
+let followOffset = null;    // offset calculado ao calçar
+
+function startManualCalibrate() {
+  // Reinicia estado de calibração manual
+  manualMode = true;
+  manualClicks = [];
+  calibrated = false;
+  lastTransform = null;
+  shoeRoot.visible = false;
+  followOffset = null;
+  editMode = false;
+  aim.classList.remove('locked');
+  setState('Modo manual: clique no calcanhar e depois na ponta do pé');
+  msg('Clique no calcanhar e depois na ponta do pé para calibrar.');
+}
+
+function handleManualClick(evt) {
+  if (!manualMode) return;
+  // Coordenadas relativas à janela
+  const x = evt.clientX;
+  const y = evt.clientY;
+  manualClicks.push({ x, y });
+  if (manualClicks.length === 1) {
+    msg('Primeiro ponto capturado. Agora clique na ponta do pé.');
+  }
+  if (manualClicks.length === 2) {
+    // Temos dois pontos: calcanhar (p0) e ponta (p1)
+    const p0 = manualClicks[0];
+    const p1 = manualClicks[1];
+    // Calcula o centro, comprimento em pixels e ângulo
+    const cx = (p0.x + p1.x) / 2;
+    const cy = (p0.y + p1.y) / 2;
+    const dx = p1.x - p0.x;
+    const dy = p1.y - p0.y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ang = Math.atan2(dy, dx);
+    // Ajusta usando controles finos e cobertura
+    const target = {
+      x: cx + v('xFine'),
+      y: cy + v('yFine'),
+      len: len * (v('cover') / 100),
+      ang: ang + rad(v('rotFine'))
+    };
+    // Aplica transformação imediatamente
+    applyTarget(target, true);
+    manualMode = false;
+    manualClicks = [];
+    setState('Calibrado pelo clique');
+    msg('Tênis calibrado manualmente.');
+    showToast('Calibrado por clique');
+  }
+}
+
+// =====================
+// Edição manual do tênis (arrastar/redimensionar)
+//
+// Permite ao usuário posicionar e redimensionar o tênis manualmente na tela,
+// antes de calçar. Após ajustar, clique no botão "Calçar" para travar a
+// posição relativa e iniciar o acompanhamento do pé.
+function startEdit(){
+  if(!shoeReady)return;
+  // Cancela calibração anterior
+  manualMode=false;
+  editMode=true;
+  calibrated=false;
+  followOffset=null;
+  // Oculta a mira e a cruz temporariamente
+  aim.classList.add('off');
+  cross.classList.add('off');
+  // Garante que o modelo esteja visível para edição
+  shoeRoot.visible=true;
+  setState('Modo edição');
+  msg('Arraste e redimensione o tênis para alinhá-lo ao pé. Quando estiver ok, toque em Calçar.');
+}
+
+function computeFollowOffset(){
+  const W=innerWidth,H=innerHeight;
+  if(!lastTransform)return null;
+  const manualX=lastTransform.x;
+  const manualY=lastTransform.y;
+  const manualScale=lastTransform.scale;
+  const manualAng=lastTransform.rz;
+  let foot=lastFoot||detectFoot()||null;
+  let tFoot;
+  if(foot){tFoot=targetFromFoot(foot);}else{tFoot=targetFromAim();}
+  const footX=tFoot.x - W/2;
+  const footY=H/2 - tFoot.y;
+  const footScale=tFoot.len/modelLen;
+  const footAng=-tFoot.ang;
+  return{ x: manualX - footX, y: manualY - footY, scale: manualScale/footScale, ang: manualAng - footAng };
+}
+
+function wearShoe(){
+  if(!editMode||!lastTransform){ msg('Arraste e redimensione o tênis antes de calçar.'); return; }
+  let off=computeFollowOffset();
+  followOffset=off;
+  editMode=false;
+  calibrated=true;
+  // Mostra novamente a mira e bloqueia
+  aim.classList.remove('off');
+  cross.classList.remove('off');
+  aim.classList.add('locked');
+  // Entra em modo IA para seguir o pé
+  mode='ai';
+  setState('Calçado');
+  msg('Tênis calçado. Agora o modelo seguirá o pé usando IA e o ajuste manual.');
+}
 function photo(){let c=document.createElement('canvas');c.width=innerWidth;c.height=innerHeight;let x=c.getContext('2d');x.drawImage(video,0,0,innerWidth,innerHeight);x.drawImage(ar,0,0);x.drawImage(guide,0,0);let a=document.createElement('a');a.download='corre4-provador.png';a.href=c.toDataURL('image/png');a.click()}
 $('openBtn').onclick=openCamera;$('loaderOpenBtn').onclick=openCamera;$('calibrateBtn').onclick=calibrateAim;$('resetBtn').onclick=reset;$('photoBtn').onclick=photo;$('settingsBtn').onclick=()=>$('drawer').classList.toggle('open');$('diagBtn').onclick=()=>diag.classList.toggle('show');$('modeAimBtn').onclick=()=>{mode='aim';$('modeAimBtn').classList.add('active');$('modeAiBtn').classList.remove('active');if(calibrated)applyTarget(targetFromAim(),true);msg('Modo mira: funciona sem a IA achar o pé.')};$('modeAiBtn').onclick=()=>{mode='ai';$('modeAiBtn').classList.add('active');$('modeAimBtn').classList.remove('active');msg(poseReady?'Modo IA: tentando seguir pé + tornozelo.':'IA ainda não carregou; use modo mira.')};$('mirrorBtn').onclick=()=>{mirror=!mirror;video.classList.toggle('mirror',mirror);$('mirrorBtn').classList.toggle('active',mirror)};$('aimBtn').onclick=()=>{showAim=!showAim;aim.classList.toggle('off',!showAim);cross.classList.toggle('off',!showAim);$('aimBtn').classList.toggle('active',showAim)};$('camBtn').onclick=async()=>{cameraFacing=cameraFacing==='environment'?'user':'environment';mirror=cameraFacing==='user';video.classList.toggle('mirror',mirror);await openCamera()};$('freezeBtn').onclick=()=>{frozen=!frozen;$('freezeBtn').classList.toggle('active',frozen);$('freezeBtn').textContent=frozen?'Retomar':'Congelar'};$('leftBtn').onclick=()=>{$('rotFine').value=+v('rotFine')-5;updateLabels();updateAimCss();if(calibrated)applyTarget(mode==='ai'&&lastFoot?targetFromFoot(lastFoot):targetFromAim(),true)};$('rightBtn').onclick=()=>{$('rotFine').value=+v('rotFine')+5;updateLabels();updateAimCss();if(calibrated)applyTarget(mode==='ai'&&lastFoot?targetFromFoot(lastFoot):targetFromAim(),true)};['aimSize','cover','yFine','xFine','rotFine','opacity','pitch','smooth'].forEach(id=>$(id).oninput=()=>{updateLabels();updateAimCss();if(calibrated)applyTarget(mode==='ai'&&lastFoot?targetFromFoot(lastFoot):targetFromAim(),false)});
+// Botão de calibração manual
+$('manualBtn').onclick = startManualCalibrate;
+// Capture cliques para calibração manual
+document.addEventListener('click', handleManualClick);
 updateLabels();initThree();resize();setState('Pronto para abrir câmera');
 </script>
 </body></html>
